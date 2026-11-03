@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Project data / generated artifacts (do not commit real research PDFs or the DB)
+data/aerf.db
+data/raw_pdfs/*
+!data/raw_pdfs/.gitkeep
+logs/*.log
+
+# Editor / OS
+.vscode/*
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+experiments/datasets/pdfs/*.pdf
+__pycache__/
+*.pyc
+logs/*.log
+experiments/runs/*.db
+
+# Environment / secrets.env.env.*!.env.example

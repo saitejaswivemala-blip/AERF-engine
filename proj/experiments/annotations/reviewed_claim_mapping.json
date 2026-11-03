@@ -1,0 +1,101 @@
+{
+  "description": "Human-reviewed mapping from ground-truth annotation claims to claim_ids in experiments/runs/experiment.db. A null db_claim_id is intentionally unresolved because no verified stored claim exists. The inspection script validates every non-null ID against the mapped paper and stored text.",
+  "mappings": {
+    "gt_01": {
+      "claim_a": {
+        "db_claim_id": 4,
+        "db_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "rationale": "P1's stored overall ARI result; the annotation uses the same OR and confidence interval with expanded wording."
+      },
+      "claim_b": {
+        "db_claim_id": 13,
+        "db_claim_text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+        "rationale": "P2's stored individual-patient analysis result; it contains the annotated odds ratio 0.58 and confidence interval 0.26-1.29."
+      }
+    },
+    "gt_02": {
+      "claim_a": {
+        "db_claim_id": 4,
+        "db_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "rationale": "P1's stored overall ARI result; same reported overall odds ratio and confidence interval."
+      },
+      "claim_b": {
+        "db_claim_id": 26,
+        "db_claim_text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+        "rationale": "P3's stored conclusion; it states the annotated population-level test-and-treat null result."
+      }
+    },
+    "gt_03": {
+      "claim_a": {
+        "db_claim_id": 13,
+        "db_claim_text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+        "rationale": "P2's stored corrected trial analysis; same null ARI finding and odds ratio as the annotation."
+      },
+      "claim_b": {
+        "db_claim_id": 26,
+        "db_claim_text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+        "rationale": "P3's stored conclusion; it states the annotated adult ARI null result."
+      }
+    },
+    "gt_04": {
+      "claim_a": {
+        "db_claim_id": 9,
+        "db_claim_text": "Although statistically significant protection was seen within some trial subsets (daily dosing trials, trials that administered 400-1000 IU/day, trials conducted for 12 months or less and trials in participants aged 1.00-15.99 years), meta-regression analysis did not yield formal evidence to suggest that effects of vitamin D were modified by any of these factors.",
+        "rationale": "P1's stored subgroup summary explicitly identifies the annotated 1.00-15.99-year protective subgroup; the exact OR 0.74 is not present in this extracted claim row."
+      },
+      "claim_b": {
+        "db_claim_id": null,
+        "db_claim_text": null,
+        "rationale": "UNRESOLVED: the P5 database claims contain no stored pediatric ARI incidence result matching the annotation."
+      }
+    },
+    "gt_05": {
+      "claim_a": {
+        "db_claim_id": 38,
+        "db_claim_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%).",
+        "rationale": "P4's stored treatment meta-analysis result; same treatment question, RR 1.07, and confidence interval."
+      },
+      "claim_b": {
+        "db_claim_id": 4,
+        "db_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "rationale": "P1's stored overall prevention result; same overall OR and confidence interval as the annotation."
+      }
+    },
+    "gt_06": {
+      "claim_a": {
+        "db_claim_id": 38,
+        "db_claim_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%).",
+        "rationale": "P4's stored treatment meta-analysis result; same treatment question, RR 1.07, and confidence interval."
+      },
+      "claim_b": {
+        "db_claim_id": null,
+        "db_claim_text": null,
+        "rationale": "UNRESOLVED: the P5 database claims contain no stored pediatric ARI incidence result matching the annotation."
+      }
+    },
+    "gt_07": {
+      "claim_a": {
+        "db_claim_id": 2,
+        "db_claim_text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+        "rationale": "P1's stored background sentence reporting the 2021 predecessor meta-analysis and OR 0.92."
+      },
+      "claim_b": {
+        "db_claim_id": 4,
+        "db_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "rationale": "P1's stored updated overall result and OR 0.94."
+      }
+    },
+    "gt_08": {
+      "claim_a": {
+        "db_claim_id": 6,
+        "db_claim_text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+        "rationale": "P1's stored daily-dosing subgroup result and OR 0.84."
+      },
+      "claim_b": {
+        "db_claim_id": 4,
+        "db_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "rationale": "P1's stored overall prevention result and OR 0.94."
+      }
+    }
+  }
+}

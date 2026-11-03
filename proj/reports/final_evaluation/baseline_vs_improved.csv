@@ -1,0 +1,7 @@
+Dataset,Label_Provenance,Model_Configuration,N,Accuracy,Claim_Precision,Claim_Recall,Claim_F1,Macro_F1,Weighted_F1,Confusion_Matrix
+Development (tests/data/claim_extractor_eval.csv),Expert-Curated (Verified Ground Truth),Majority Class Baseline,80,57.50%,0.00%,0.00%,0.00%,36.51%,41.98%,"TP=0, FP=0, FN=34, TN=46"
+Development (tests/data/claim_extractor_eval.csv),Expert-Curated (Verified Ground Truth),Rule-Based Keyword Baseline,80,66.25%,88.89%,23.53%,37.21%,57.07%,60.04%,"TP=8, FP=1, FN=26, TN=45"
+Development (tests/data/claim_extractor_eval.csv),Expert-Curated (Verified Ground Truth),Baseline Extractor (pre-improvement),80,83.75%,73.33%,97.06%,83.54%,83.75%,83.78%,"TP=33, FP=12, FN=1, TN=34"
+Development (tests/data/claim_extractor_eval.csv),Expert-Curated (Verified Ground Truth),AERF 2.0 Improved Hybrid Extractor,80,91.25%,82.93%,100.00%,90.67%,91.22%,91.30%,"TP=34, FP=7, FN=0, TN=39"
+Independent (claim_extractor_independent_provisional_eval.csv),PROVISIONAL (Unverified AI Consensus),Baseline Extractor (pre-improvement),143,46.85%,85.11%,36.70%,51.28%,46.41%,48.97%,"TP=40, FP=7, FN=69, TN=27"
+Independent (claim_extractor_independent_provisional_eval.csv),PROVISIONAL (Unverified AI Consensus),AERF 2.0 Improved Hybrid Extractor,143,81.82%,90.29%,85.32%,87.74%,76.30%,82.30%,"TP=93, FP=10, FN=16, TN=24"

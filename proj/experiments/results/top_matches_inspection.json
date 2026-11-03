@@ -1,0 +1,735 @@
+{
+  "all_claims_by_paper": {
+    "P1": [
+      {
+        "claim_id": 1,
+        "paper_id": 1,
+        "chunk_id": 1,
+        "text": "Vitamin D supplementation to prevent acute respiratory infections: systematic review and meta-analysis of stratified aggregate data Jolliffe DA, Camargo CA Jr, Sluyter JD, et al. (Martineau AR, senior author) (2024).",
+        "span_start": 0,
+        "span_end": 216,
+        "extracted_at": "2026-09-01 20:17:04"
+      },
+      {
+        "claim_id": 2,
+        "paper_id": 1,
+        "chunk_id": 2,
+        "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+        "span_start": 0,
+        "span_end": 411,
+        "extracted_at": "2026-09-01 20:17:13"
+      },
+      {
+        "claim_id": 3,
+        "paper_id": 1,
+        "chunk_id": 4,
+        "text": "Findings: We identified 6 new RCTs (19,337 participants).",
+        "span_start": 0,
+        "span_end": 57,
+        "extracted_at": "2026-09-01 20:17:14"
+      },
+      {
+        "claim_id": 4,
+        "paper_id": 1,
+        "chunk_id": 6,
+        "text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+        "span_start": 0,
+        "span_end": 182,
+        "extracted_at": "2026-09-01 20:17:17"
+      },
+      {
+        "claim_id": 5,
+        "paper_id": 1,
+        "chunk_id": 8,
+        "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+        "span_start": 0,
+        "span_end": 267,
+        "extracted_at": "2026-09-01 20:17:19"
+      },
+      {
+        "claim_id": 6,
+        "paper_id": 1,
+        "chunk_id": 13,
+        "text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+        "span_start": 0,
+        "span_end": 114,
+        "extracted_at": "2026-09-01 20:17:20"
+      },
+      {
+        "claim_id": 7,
+        "paper_id": 1,
+        "chunk_id": 15,
+        "text": "Dosing frequency, monthly or less (12 studies): OR 0.98 (95% CI 0.93 to 1.03) - not significant.",
+        "span_start": 0,
+        "span_end": 96,
+        "extracted_at": "2026-09-01 20:17:22"
+      },
+      {
+        "claim_id": 8,
+        "paper_id": 1,
+        "chunk_id": 17,
+        "text": "Discussion (excerpt) The point estimate of the overall effect of vitamin D supplementation on ARI risk obtained in the current analysis (0.94) is similar to that yielded by our previous meta-analysis (0.92).",
+        "span_start": 0,
+        "span_end": 207,
+        "extracted_at": "2026-09-01 20:17:23"
+      },
+      {
+        "claim_id": 9,
+        "paper_id": 1,
+        "chunk_id": 19,
+        "text": "Although statistically significant protection was seen within some trial subsets (daily dosing trials, trials that administered 400-1000 IU/day, trials conducted for 12 months or less and trials in participants aged 1.00-15.99 years), meta-regression analysis did not yield formal evidence to suggest that effects of vitamin D were modified by any of these factors.",
+        "span_start": 0,
+        "span_end": 365,
+        "extracted_at": "2026-09-01 20:17:25"
+      }
+    ],
+    "P2": [
+      {
+        "claim_id": 10,
+        "paper_id": 2,
+        "chunk_id": 20,
+        "text": "Vitamin D and acute respiratory infection: secondary analysis of a previous randomised controlled trial and updated meta-analyses Bolland MJ, Avenell A, Grey A, Gamble G (2022).",
+        "span_start": 0,
+        "span_end": 177,
+        "extracted_at": "2026-09-01 20:18:26"
+      },
+      {
+        "claim_id": 11,
+        "paper_id": 2,
+        "chunk_id": 21,
+        "text": "DOI/ID: 10.1101/2022.02.03.22270409 Source: https://www.medrxiv.org/content/10.1101/2022.02.03.22270409 Abstract Background: Recent meta-analyses concluded that vitamin D supplementation can prevent acute respiratory infection (ARI).",
+        "span_start": 0,
+        "span_end": 233,
+        "extracted_at": "2026-09-01 20:18:34"
+      },
+      {
+        "claim_id": 12,
+        "paper_id": 2,
+        "chunk_id": 22,
+        "text": "However, the findings were heavily influenced by results from two arms of a six-arm cluster-randomised trial that were analysed without accounting for the cluster trial design.",
+        "span_start": 0,
+        "span_end": 176,
+        "extracted_at": "2026-09-01 20:18:35"
+      },
+      {
+        "claim_id": 13,
+        "paper_id": 2,
+        "chunk_id": 26,
+        "text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+        "span_start": 0,
+        "span_end": 246,
+        "extracted_at": "2026-09-01 20:18:39"
+      },
+      {
+        "claim_id": 14,
+        "paper_id": 2,
+        "chunk_id": 27,
+        "text": "Update of the previous meta-analysis showed no effect of vitamin D on ARI either when data from the two arms of the trial, or when all trial arms were incorporated (RR 0.98, 0.96-1.00, P=0.10 both analyses).",
+        "span_start": 0,
+        "span_end": 207,
+        "extracted_at": "2026-09-01 20:18:40"
+      },
+      {
+        "claim_id": 15,
+        "paper_id": 2,
+        "chunk_id": 28,
+        "text": "Conclusions: Overall, vitamin D supplementation had no effect on the risk of an ARI or on the number of ARIs in this trial or in a re-analysis of the most recent meta-analysis.",
+        "span_start": 0,
+        "span_end": 176,
+        "extracted_at": "2026-09-01 20:18:41"
+      },
+      {
+        "claim_id": 16,
+        "paper_id": 2,
+        "chunk_id": 29,
+        "text": "The results of the updated meta-analysis do not suggest that vitamin D supplementation would reduce the risk of Covid 19.",
+        "span_start": 0,
+        "span_end": 121,
+        "extracted_at": "2026-09-01 20:18:42"
+      },
+      {
+        "claim_id": 17,
+        "paper_id": 2,
+        "chunk_id": 30,
+        "text": "Introduction (excerpt) Two recent high profile meta-analyses from the same research group have concluded that vitamin D supplements can reduce the risk of ARI.",
+        "span_start": 0,
+        "span_end": 159,
+        "extracted_at": "2026-09-01 20:18:43"
+      },
+      {
+        "claim_id": 18,
+        "paper_id": 2,
+        "chunk_id": 32,
+        "text": "One example of the influence of this trial report is that in the first meta-analysis (using individual patient data), daily or weekly vitamin D reduced the odds of ARI by 70% in the subgroup with baseline 25-hydroxyvitamin D (25OHD) <25 nmol/L.",
+        "span_start": 0,
+        "span_end": 244,
+        "extracted_at": "2026-09-01 20:18:46"
+      },
+      {
+        "claim_id": 19,
+        "paper_id": 2,
+        "chunk_id": 36,
+        "text": "Discussion (excerpt) These newly reported results show that vitamin D supplementation had no statistically significant effect on the proportion of individuals with an ARI or on the number of ARIs in this trial.",
+        "span_start": 0,
+        "span_end": 210,
+        "extracted_at": "2026-09-01 20:18:49"
+      },
+      {
+        "claim_id": 20,
+        "paper_id": 2,
+        "chunk_id": 38,
+        "text": "As of February 2022, the two meta-analyses have been cited 48 and 881 times",
+        "span_start": 0,
+        "span_end": 75,
+        "extracted_at": "2026-09-01 20:18:51"
+      },
+      {
+        "claim_id": 21,
+        "paper_id": 2,
+        "chunk_id": 40,
+        "text": "Many citing documents cite these two meta-analyses as evidence that vitamin D supplements may reduce the risk of Covid-19 or mitigate the illness.",
+        "span_start": 0,
+        "span_end": 146,
+        "extracted_at": "2026-09-01 20:18:52"
+      },
+      {
+        "claim_id": 22,
+        "paper_id": 2,
+        "chunk_id": 41,
+        "text": "The updated pooled trial-level meta-analysis results do not support suggestions that vitamin D supplementation should be prescribed to prevent Covid-19.",
+        "span_start": 0,
+        "span_end": 152,
+        "extracted_at": "2026-09-01 20:18:53"
+      }
+    ],
+    "P3": [
+      {
+        "claim_id": 23,
+        "paper_id": 3,
+        "chunk_id": 42,
+        "text": "Vitamin D Supplements for Prevention of COVID-19 or other Acute Respiratory Infections: a Phase 3 Randomised Controlled Trial (CORONAVIT) Jolliffe DA, Holt H, Greenig M, et al. (Martineau AR, senior author) (2022).",
+        "span_start": 0,
+        "span_end": 214,
+        "extracted_at": "2026-09-01 20:20:36"
+      },
+      {
+        "claim_id": 24,
+        "paper_id": 3,
+        "chunk_id": 43,
+        "text": "DOI/ID: 10.1101/2022.03.22.22271707 Source: https://www.medrxiv.org/content/10.1101/2022.03.22.22271707 Abstract OBJECTIVES: To determine whether population-level implementation of a test-and-treat approach to correction of sub-optimal vitamin D status (25(OH)D <75 nmol/L) influences risk of all-cause acute respiratory infection (ARI) or coronavirus disease 2019 (COVID-19).",
+        "span_start": 0,
+        "span_end": 376,
+        "extracted_at": "2026-09-01 20:20:44"
+      },
+      {
+        "claim_id": 25,
+        "paper_id": 3,
+        "chunk_id": 46,
+        "text": "RESULTS: Of 3100 participants offered 25(OH)D testing, 2958 (95.4%) accepted, and 2690 (86.8%) had 25(OH)D <75 nmol/L and were sent vitamin D supplements.",
+        "span_start": 0,
+        "span_end": 154,
+        "extracted_at": "2026-09-01 20:20:48"
+      },
+      {
+        "claim_id": 26,
+        "paper_id": 3,
+        "chunk_id": 49,
+        "text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+        "span_start": 0,
+        "span_end": 226,
+        "extracted_at": "2026-09-01 20:20:54"
+      },
+      {
+        "claim_id": 27,
+        "paper_id": 3,
+        "chunk_id": 50,
+        "text": "Discussion (excerpt) No statistically significant effect of either dose was seen on the primary outcome of incident doctor- or swab test-confirmed ARI, or on the major secondary outcome of incident swab test-confirmed COVID-19.",
+        "span_start": 0,
+        "span_end": 227,
+        "extracted_at": "2026-09-01 20:20:55"
+      },
+      {
+        "claim_id": 28,
+        "paper_id": 3,
+        "chunk_id": 51,
+        "text": "Oral vitamin D supplementation was safe and well-tolerated at both doses investigated.",
+        "span_start": 0,
+        "span_end": 86,
+        "extracted_at": "2026-09-01 20:20:56"
+      },
+      {
+        "claim_id": 29,
+        "paper_id": 3,
+        "chunk_id": 52,
+        "text": "The results from the current study do not support the hypothesis that such regimens offer protection against ARI, and are consistent with those of several other recent phase 3 trials of vitamin D supplementation that have reported no effect of vitamin D supplementation on risk of ARIs.",
+        "span_start": 0,
+        "span_end": 286,
+        "extracted_at": "2026-09-01 20:20:58"
+      },
+      {
+        "claim_id": 30,
+        "paper_id": 3,
+        "chunk_id": 53,
+        "text": "This contrasts with recent findings from a Phase 2 RCT conducted in Mexican health care workers, which reported a strong protective effect of a daily dose of 4,000 IU vitamin D.",
+        "span_start": 0,
+        "span_end": 177,
+        "extracted_at": "2026-09-01 20:20:59"
+      }
+    ],
+    "P4": [
+      {
+        "claim_id": 31,
+        "paper_id": 4,
+        "chunk_id": 54,
+        "text": "Efficacy of Vitamin D Supplements in Treatment of Acute Respiratory Infection: A Meta-analysis for Randomized Controlled Trials (PMC record; full author list not independently verified in this session) (2022).",
+        "span_start": 0,
+        "span_end": 209,
+        "extracted_at": "2026-09-01 20:25:50"
+      },
+      {
+        "claim_id": 32,
+        "paper_id": 4,
+        "chunk_id": 56,
+        "text": "DOI/ID: PMID 35334804 Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC8955452/ Note on source This PDF was assembled from the indexed abstract of PMCID PMC8955452 only.",
+        "span_start": 0,
+        "span_end": 169,
+        "extracted_at": "2026-09-01 20:25:58"
+      },
+      {
+        "claim_id": 33,
+        "paper_id": 4,
+        "chunk_id": 57,
+        "text": "The PMC article page could not be automatically retrieved in this authoring session (blocked by an automated bot-check interstitial); the full text is confirmed to be freely available at https://pmc.ncbi.nlm.nih.gov/articles/PMC8955452/ and should be substituted for this abstract excerpt before treating any experimental result involving this paper as final.",
+        "span_start": 0,
+        "span_end": 359,
+        "extracted_at": "2026-09-01 20:25:59"
+      },
+      {
+        "claim_id": 34,
+        "paper_id": 4,
+        "chunk_id": 58,
+        "text": "Abstract (as indexed) Efficacy of Vitamin D Supplements in Treatment of Acute Respiratory Infection: A Meta-analysis for Randomized Controlled Trials.",
+        "span_start": 0,
+        "span_end": 150,
+        "extracted_at": "2026-09-01 20:26:01"
+      },
+      {
+        "claim_id": 35,
+        "paper_id": 4,
+        "chunk_id": 60,
+        "text": "Background: Recent randomized controlled trials (RCTs) have reported inconsistent findings regarding the efficacy of vitamin D supplementation in the treatment of acute respiratory infections (ARIs).",
+        "span_start": 0,
+        "span_end": 199,
+        "extracted_at": "2026-09-01 20:26:02"
+      },
+      {
+        "claim_id": 36,
+        "paper_id": 4,
+        "chunk_id": 61,
+        "text": "This study aimed to investigate the efficacy of vitamin D supplementation in the treatment of ARIs using a meta-analysis of RCTs.",
+        "span_start": 0,
+        "span_end": 129,
+        "extracted_at": "2026-09-01 20:26:03"
+      },
+      {
+        "claim_id": 37,
+        "paper_id": 4,
+        "chunk_id": 63,
+        "text": "Results: Out of 390 articles retrieved from the databases, we included 18 RCTs, which involved 3648 participants, with 1838 in an intervention group and 1810 in a control group in the final analysis.",
+        "span_start": 0,
+        "span_end": 199,
+        "extracted_at": "2026-09-01 20:26:06"
+      },
+      {
+        "claim_id": 38,
+        "paper_id": 4,
+        "chunk_id": 64,
+        "text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%).",
+        "span_start": 0,
+        "span_end": 192,
+        "extracted_at": "2026-09-01 20:26:07"
+      }
+    ],
+    "P5": [
+      {
+        "claim_id": 39,
+        "paper_id": 5,
+        "chunk_id": 65,
+        "text": "The role of vitamin D in the prevention and treatment of acute respiratory infections in pediatric populations: a systematic review and meta-analysis of randomized controlled trials (PMC record; full author list not independently verified in this session) (2025).",
+        "span_start": 0,
+        "span_end": 263,
+        "extracted_at": "2026-09-01 20:28:07"
+      },
+      {
+        "claim_id": 40,
+        "paper_id": 5,
+        "chunk_id": 67,
+        "text": "DOI/ID: PMCID PMC12699866 Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC12699866/ Note on source This PDF was assembled from the indexed abstract of PMCID PMC12699866 only.",
+        "span_start": 0,
+        "span_end": 175,
+        "extracted_at": "2026-09-01 20:28:14"
+      },
+      {
+        "claim_id": 41,
+        "paper_id": 5,
+        "chunk_id": 68,
+        "text": "The PMC article page could not be automatically retrieved in this authoring session (blocked by an automated bot-check interstitial); the full text is confirmed to be freely available at https://pmc.ncbi.nlm.nih.gov/articles/PMC12699866/ and should be substituted for this abstract excerpt before treating any experimental result involving this paper as final.",
+        "span_start": 0,
+        "span_end": 360,
+        "extracted_at": "2026-09-01 20:28:16"
+      },
+      {
+        "claim_id": 42,
+        "paper_id": 5,
+        "chunk_id": 69,
+        "text": "Abstract (as indexed) The role of vitamin D in the prevention and treatment of acute respiratory infections in pediatric populations: a systematic review and meta-analysis of randomized controlled trials.",
+        "span_start": 0,
+        "span_end": 204,
+        "extracted_at": "2026-09-01 20:28:17"
+      },
+      {
+        "claim_id": 43,
+        "paper_id": 5,
+        "chunk_id": 72,
+        "text": "Eligible RCTs enrolled pediatric populations, comparing oral vitamin D supplementation with placebo or no treatment, and reported ARI-related outcomes.",
+        "span_start": 0,
+        "span_end": 151,
+        "extracted_at": "2026-09-01 20:28:19"
+      }
+    ]
+  },
+  "ground_truth_top_matches": [
+    {
+      "paper": "P1",
+      "human_text": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+      "used_in": "gt_01.A, gt_02.A",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.326 against claim_id=5",
+        "best_candidate": 5
+      },
+      "candidates": [
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.326,
+          "sequence_ratio": 0.086
+        },
+        {
+          "claim_id": 4,
+          "text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+          "jaccard_token_overlap": 0.318,
+          "sequence_ratio": 0.506
+        },
+        {
+          "claim_id": 2,
+          "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+          "jaccard_token_overlap": 0.258,
+          "sequence_ratio": 0.163
+        }
+      ]
+    },
+    {
+      "paper": "P2",
+      "human_text": "After adjusting for cluster randomisation, vitamin D supplementation had no statistically significant effect on acute respiratory infection risk in the Blue Sky trial (odds ratio 0.58, 95% CI 0.26 to 1.29).",
+      "used_in": "gt_01.B, gt_03.A",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.309 against claim_id=13",
+        "best_candidate": 13
+      },
+      "candidates": [
+        {
+          "claim_id": 13,
+          "text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+          "jaccard_token_overlap": 0.309,
+          "sequence_ratio": 0.142
+        },
+        {
+          "claim_id": 19,
+          "text": "Discussion (excerpt) These newly reported results show that vitamin D supplementation had no statistically significant effect on the proportion of individuals with an ARI or on the number of ARIs in this trial.",
+          "jaccard_token_overlap": 0.235,
+          "sequence_ratio": 0.019
+        },
+        {
+          "claim_id": 15,
+          "text": "Conclusions: Overall, vitamin D supplementation had no effect on the risk of an ARI or on the number of ARIs in this trial or in a re-analysis of the most recent meta-analysis.",
+          "jaccard_token_overlap": 0.229,
+          "sequence_ratio": 0.461
+        }
+      ]
+    },
+    {
+      "paper": "P3",
+      "human_text": "A population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause acute respiratory infection in UK adults (OR 1.09-1.26).",
+      "used_in": "gt_02.B, gt_03.B",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.488 against claim_id=26",
+        "best_candidate": 26
+      },
+      "candidates": [
+        {
+          "claim_id": 26,
+          "text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+          "jaccard_token_overlap": 0.488,
+          "sequence_ratio": 0.543
+        },
+        {
+          "claim_id": 24,
+          "text": "DOI/ID: 10.1101/2022.03.22.22271707 Source: https://www.medrxiv.org/content/10.1101/2022.03.22.22271707 Abstract OBJECTIVES: To determine whether population-level implementation of a test-and-treat approach to correction of sub-optimal vitamin D status (25(OH)D <75 nmol/L) influences risk of all-cause acute respiratory infection (ARI) or coronavirus disease 2019 (COVID-19).",
+          "jaccard_token_overlap": 0.286,
+          "sequence_ratio": 0.191
+        },
+        {
+          "claim_id": 23,
+          "text": "Vitamin D Supplements for Prevention of COVID-19 or other Acute Respiratory Infections: a Phase 3 Randomised Controlled Trial (CORONAVIT) Jolliffe DA, Holt H, Greenig M, et al. (Martineau AR, senior author) (2022).",
+          "jaccard_token_overlap": 0.13,
+          "sequence_ratio": 0.032
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "In the subgroup aged 1.00 to 15.99 years receiving daily vitamin D dosing, supplementation showed a statistically significant protective effect against acute respiratory infection (OR 0.74, 95% CI 0.60 to 0.92).",
+      "used_in": "gt_04.A",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.282 against claim_id=6",
+        "best_candidate": 6
+      },
+      "candidates": [
+        {
+          "claim_id": 6,
+          "text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+          "jaccard_token_overlap": 0.282,
+          "sequence_ratio": 0.394
+        },
+        {
+          "claim_id": 2,
+          "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+          "jaccard_token_overlap": 0.261,
+          "sequence_ratio": 0.068
+        },
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.228,
+          "sequence_ratio": 0.038
+        }
+      ]
+    },
+    {
+      "paper": "P5",
+      "human_text": "Vitamin D supplementation did not significantly reduce acute respiratory infection incidence in pediatric populations (RR 0.82, 95% CI 0.64 to 1.06).",
+      "used_in": "gt_04.B, gt_06.B",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.171 against claim_id=42",
+        "best_candidate": 42
+      },
+      "candidates": [
+        {
+          "claim_id": 42,
+          "text": "Abstract (as indexed) The role of vitamin D in the prevention and treatment of acute respiratory infections in pediatric populations: a systematic review and meta-analysis of randomized controlled trials.",
+          "jaccard_token_overlap": 0.171,
+          "sequence_ratio": 0.091
+        },
+        {
+          "claim_id": 39,
+          "text": "The role of vitamin D in the prevention and treatment of acute respiratory infections in pediatric populations: a systematic review and meta-analysis of randomized controlled trials (PMC record; full author list not independently verified in this session) (2025).",
+          "jaccard_token_overlap": 0.167,
+          "sequence_ratio": 0.039
+        },
+        {
+          "claim_id": 43,
+          "text": "Eligible RCTs enrolled pediatric populations, comparing oral vitamin D supplementation with placebo or no treatment, and reported ARI-related outcomes.",
+          "jaccard_token_overlap": 0.132,
+          "sequence_ratio": 0.32
+        }
+      ]
+    },
+    {
+      "paper": "P4",
+      "human_text": "In a meta-analysis of 18 RCTs, vitamin D supplements had a statistically significant beneficial effect in the TREATMENT of acute respiratory infections (RR 1.07, 95% CI 1.01 to 1.13).",
+      "used_in": "gt_05.A, gt_06.A",
+      "resolver_outcome": {
+        "status": "resolved",
+        "method": "token_overlap",
+        "score": 0.526,
+        "claim_id": 38,
+        "matched_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%)."
+      },
+      "candidates": [
+        {
+          "claim_id": 38,
+          "text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%).",
+          "jaccard_token_overlap": 0.526,
+          "sequence_ratio": 0.656
+        },
+        {
+          "claim_id": 36,
+          "text": "This study aimed to investigate the efficacy of vitamin D supplementation in the treatment of ARIs using a meta-analysis of RCTs.",
+          "jaccard_token_overlap": 0.306,
+          "sequence_ratio": 0.391
+        },
+        {
+          "claim_id": 34,
+          "text": "Abstract (as indexed) Efficacy of Vitamin D Supplements in Treatment of Acute Respiratory Infection: A Meta-analysis for Randomized Controlled Trials.",
+          "jaccard_token_overlap": 0.297,
+          "sequence_ratio": 0.498
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "Vitamin D supplementation for PREVENTION of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+      "used_in": "gt_05.B",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.326 against claim_id=5",
+        "best_candidate": 5
+      },
+      "candidates": [
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.326,
+          "sequence_ratio": 0.086
+        },
+        {
+          "claim_id": 4,
+          "text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+          "jaccard_token_overlap": 0.318,
+          "sequence_ratio": 0.506
+        },
+        {
+          "claim_id": 2,
+          "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+          "jaccard_token_overlap": 0.258,
+          "sequence_ratio": 0.163
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "A 2021 meta-analysis of 37 RCTs found a statistically significant protective effect of vitamin D supplementation against acute respiratory infection (OR 0.92, 95% CI 0.86 to 0.99).",
+      "used_in": "gt_07.A",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.421 against claim_id=2",
+        "best_candidate": 2
+      },
+      "candidates": [
+        {
+          "claim_id": 2,
+          "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+          "jaccard_token_overlap": 0.421,
+          "sequence_ratio": 0.332
+        },
+        {
+          "claim_id": 6,
+          "text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+          "jaccard_token_overlap": 0.257,
+          "sequence_ratio": 0.395
+        },
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.255,
+          "sequence_ratio": 0.291
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "An updated 2024 meta-analysis of the same trials plus new data found vitamin D supplementation did not significantly affect overall acute respiratory infection risk (OR 0.94, 95% CI 0.88 to 1.00).",
+      "used_in": "gt_07.B",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.388 against claim_id=4",
+        "best_candidate": 4
+      },
+      "candidates": [
+        {
+          "claim_id": 4,
+          "text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+          "jaccard_token_overlap": 0.388,
+          "sequence_ratio": 0.593
+        },
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.268,
+          "sequence_ratio": 0.164
+        },
+        {
+          "claim_id": 8,
+          "text": "Discussion (excerpt) The point estimate of the overall effect of vitamin D supplementation on ARI risk obtained in the current analysis (0.94) is similar to that yielded by our previous meta-analysis (0.92).",
+          "jaccard_token_overlap": 0.231,
+          "sequence_ratio": 0.084
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "In trials administering vitamin D daily, there was a statistically significant protective effect against acute respiratory infection (OR 0.84, 95% CI 0.73 to 0.97).",
+      "used_in": "gt_08.A",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.448 against claim_id=6",
+        "best_candidate": 6
+      },
+      "candidates": [
+        {
+          "claim_id": 6,
+          "text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+          "jaccard_token_overlap": 0.448,
+          "sequence_ratio": 0.439
+        },
+        {
+          "claim_id": 2,
+          "text": "DOI/ID: 10.1101/2024.09.18.24313866 Source: https://www.medrxiv.org/content/10.1101/2024.09.18.24313866 Abstract Background: A 2021 meta-analysis of 37 randomised controlled trials (RCTs) of vitamin D supplementation for prevention of acute respiratory infections (ARI) revealed a statistically significant protective effect of the intervention (odds ratio [OR] 0.92, 95% confidence interval [CI] 0.86 to 0.99).",
+          "jaccard_token_overlap": 0.234,
+          "sequence_ratio": 0.087
+        },
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.17,
+          "sequence_ratio": 0.079
+        }
+      ]
+    },
+    {
+      "paper": "P1",
+      "human_text": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect across all dosing regimens (OR 0.94, 95% CI 0.88 to 1.00).",
+      "used_in": "gt_08.B",
+      "resolver_outcome": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.300 against claim_id=5",
+        "best_candidate": 5
+      },
+      "candidates": [
+        {
+          "claim_id": 5,
+          "text": "Interpretation: This updated meta-analysis yielded a similar point estimate for the overall effect of vitamin D supplementation on ARI risk to that obtained previously, but the 95% CI for this effect now spans 1.00, indicating no statistically significant protection.",
+          "jaccard_token_overlap": 0.3,
+          "sequence_ratio": 0.08
+        },
+        {
+          "claim_id": 4,
+          "text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+          "jaccard_token_overlap": 0.292,
+          "sequence_ratio": 0.507
+        },
+        {
+          "claim_id": 6,
+          "text": "Dosing frequency, daily (21 studies): OR 0.84 (95% CI 0.73 to 0.97) - statistically significant protective effect.",
+          "jaccard_token_overlap": 0.25,
+          "sequence_ratio": 0.386
+        }
+      ]
+    }
+  ]
+}

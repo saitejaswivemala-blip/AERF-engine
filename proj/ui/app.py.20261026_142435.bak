@@ -1,0 +1,3008 @@
+import json
+
+import sqlite3
+
+from pathlib import Path
+
+
+
+import pandas as pd
+
+import streamlit as st
+
+import shutil
+
+from pipeline.orchestrator import ingest_paper
+
+
+
+# ============================================================
+
+# AERF ENGINE — RESEARCH DASHBOARD
+
+# ============================================================
+
+
+
+st.set_page_config(
+
+    page_title="AERF Engine",
+
+    page_icon="🧠",
+
+    layout="wide",
+
+    initial_sidebar_state="expanded",
+
+)
+
+
+
+
+
+# ============================================================
+
+# PATHS
+
+# ============================================================
+
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+
+DB_DIR = PROJECT_ROOT / "experiments" / "runs"
+
+RESULT_DIR = PROJECT_ROOT / "experiments" / "results"
+
+
+
+
+
+# ============================================================
+
+# DATABASE
+
+# ============================================================
+
+
+
+def find_latest(folder, pattern):
+
+    if not folder.exists():
+
+        return None
+
+
+
+    files = list(folder.glob(pattern))
+
+
+
+    if not files:
+
+        return None
+
+
+
+    return max(files, key=lambda x: x.stat().st_mtime)
+
+
+
+
+
+@st.cache_resource(show_spinner="Loading NLP models (first run only)...")
+def _load_phase2_models():
+    from pipeline.phase2 import Phase2Pipeline
+    return Phase2Pipeline(None)
+
+
+@st.cache_resource(show_spinner="Loading NLI model (first run only)...")
+def _load_phase3_models():
+    from pipeline.phase3 import Phase3Pipeline
+    return Phase3Pipeline(None)
+
+
+def get_phase2_pipeline(repository):
+    p = _load_phase2_models()
+    p.repo = repository
+    return p
+
+
+def get_phase3_pipeline(repository):
+    p = _load_phase3_models()
+    p.repo = repository
+    p.scorer.repo = repository
+    p.updater.repo = repository
+    return p
+
+
+@st.cache_resource
+
+def get_connection(db_path):
+
+    if db_path is None:
+
+        return None
+
+
+
+    return sqlite3.connect(str(db_path), check_same_thread=False)
+
+@st.cache_data
+
+def get_tables(db_path):
+
+    connection = get_connection(db_path)
+
+
+
+    if connection is None:
+
+        return []
+
+
+
+    query = """
+
+        SELECT name
+
+        FROM sqlite_master
+
+        WHERE type='table'
+
+        ORDER BY name
+
+    """
+
+
+
+    return pd.read_sql_query(query, connection)["name"].tolist()
+
+
+@st.cache_data
+def _read_table(table_name, db_path, limit=None):
+    connection = get_connection(db_path)
+    tables = get_tables(db_path)
+
+    if connection is None or table_name not in tables:
+        return pd.DataFrame()
+
+    try:
+        if limit is None:
+            query = f'SELECT * FROM "{table_name}"'
+            return pd.read_sql_query(query, connection)
+
+        query = f'SELECT * FROM "{table_name}" LIMIT ?'
+        return pd.read_sql_query(
+            query,
+            connection,
+            params=(int(limit),),
+        )
+
+    except Exception:
+        return pd.DataFrame()
+
+
+def read_table(table_name, limit=None):
+    return _read_table(
+        table_name,
+        str(selected_db_path),
+        limit=limit,
+    )
+
+
+@st.cache_data
+
+def _get_table_columns(table_name, db_path):
+
+    connection = get_connection(db_path)
+
+
+
+    if connection is None:
+
+        return []
+
+
+
+    try:
+
+        df = pd.read_sql_query(
+
+            f'PRAGMA table_info("{table_name}")',
+
+            connection,
+
+        )
+
+
+
+        return df["name"].tolist()
+
+    except Exception:
+
+        return []
+
+
+
+
+
+def get_table_columns(table_name):
+
+    return _get_table_columns(table_name, str(selected_db_path))
+
+
+
+
+
+# ============================================================
+
+# RESULT JSON
+
+# ============================================================
+
+
+
+def load_result():
+
+
+
+    path = find_latest(
+
+        RESULT_DIR,
+
+        "*.json",
+
+    )
+
+
+
+    if path is None:
+
+        return None
+
+
+
+    try:
+
+        with open(path, "r", encoding="utf-8") as f:
+
+            return json.load(f)
+
+    except Exception:
+
+        return None
+
+
+
+
+
+result = load_result()
+
+
+
+
+
+# ============================================================
+
+# HELPERS
+
+# ============================================================
+
+
+
+def first_existing(columns, candidates):
+
+
+
+    for candidate in candidates:
+
+
+
+        if candidate in columns:
+
+            return candidate
+
+
+
+    return None
+
+
+
+
+
+def format_number(value):
+
+
+
+    if value is None:
+
+        return "—"
+
+
+
+    try:
+
+
+
+        value = float(value)
+
+
+
+        if value.is_integer():
+
+            return f"{int(value):,}"
+
+
+
+        return f"{value:.3f}"
+
+
+
+    except Exception:
+
+        return str(value)
+
+
+
+
+
+def truncate(text, length=180):
+
+
+
+    text = str(text)
+
+
+
+    if len(text) <= length:
+
+        return text
+
+
+
+    return text[:length] + "…"
+
+
+
+
+
+def result_value(section, key, default=0):
+
+
+
+    if not isinstance(result, dict):
+
+        return default
+
+
+
+    obj = result.get(section, {})
+
+
+
+    if not isinstance(obj, dict):
+
+        return default
+
+
+
+    return obj.get(key, default)
+
+
+
+
+
+# ============================================================
+
+# GLOBAL CSS
+
+# ============================================================
+
+
+
+st.markdown(
+
+    """
+
+    <style>
+
+
+
+    .main-title {
+
+        font-size: 2.5rem;
+
+        font-weight: 700;
+
+        margin-bottom: 0.2rem;
+
+    }
+
+
+
+    .subtitle {
+
+        color: #6b7280;
+
+        font-size: 1rem;
+
+        margin-bottom: 1.5rem;
+
+    }
+
+
+
+    .section-title {
+
+        font-size: 1.5rem;
+
+        font-weight: 650;
+
+        margin-top: 1rem;
+
+    }
+
+
+
+    .claim-card {
+
+        padding: 1rem;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 12px;
+
+        margin-bottom: 0.8rem;
+
+        background: #ffffff;
+
+    }
+
+
+
+    .status-support {
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        background: #dcfce7;
+
+        color: #166534;
+
+        font-weight: 600;
+
+    }
+
+
+
+    .status-contradict {
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        background: #fee2e2;
+
+        color: #991b1b;
+
+        font-weight: 600;
+
+    }
+
+
+
+    .status-neutral {
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        background: #f3f4f6;
+
+        color: #374151;
+
+        font-weight: 600;
+
+    }
+
+
+
+    </style>
+
+    """,
+
+    unsafe_allow_html=True,
+
+)
+
+
+
+
+
+# ============================================================
+
+# SIDEBAR
+
+# ============================================================
+
+
+
+st.sidebar.markdown(
+
+    "# 🧠 AERF Engine"
+
+)
+
+
+
+st.sidebar.caption(
+
+    "Adaptive Evidence Reliability & Reasoning"
+
+)
+
+
+
+st.sidebar.divider()
+
+
+
+sessions_dir = DB_DIR / "sessions"
+session_db_files = list(sessions_dir.glob("*.db")) if sessions_dir.exists() else []
+database_files = sorted(list(DB_DIR.glob("*.db")) + session_db_files, key=lambda path: path.name)
+
+database_names = [path.name for path in database_files]
+
+default_database = "experiment_FINAL_2026-09-02.db"
+
+default_index = (
+
+    database_names.index(default_database)
+
+    if default_database in database_names
+
+    else 0
+
+)
+
+
+
+selected_database_name = st.sidebar.selectbox(
+
+    "Database",
+
+    database_names,
+
+    index=default_index,
+
+)
+
+selected_db_path = next((p for p in database_files if p.name == selected_database_name), None) if database_names else None
+
+
+
+conn = get_connection(str(selected_db_path) if selected_db_path else None)
+
+tables = get_tables(str(selected_db_path) if selected_db_path else None)
+
+
+
+page = st.sidebar.radio(
+
+    "Navigation",
+
+    [
+
+        "🏠 Overview",
+
+        "📄 Scientific Claims",
+
+        "🔗 Evidence Relationships",
+
+        "📊 AERF Reliability",
+
+        "🕸️ Evidence Graph",
+
+        "⏳ Temporal Evolution",
+
+        "🔎 Research Gaps",
+
+        "🧬 Extracted Relations",
+
+        "🗃️ Database Explorer",
+
+        "📄 New Analysis",
+
+    ],
+
+)
+
+
+
+st.sidebar.divider()
+
+
+
+st.sidebar.caption(
+
+    "Real experiment data • SQLite • AERF Engine"
+
+)
+
+
+
+
+
+# ============================================================
+
+# OVERVIEW
+
+# ============================================================
+
+
+
+if page == "🏠 Overview":
+
+
+
+    st.markdown(
+
+        '<div class="main-title">Adaptive Evidence Reliability & Reasoning Engine</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.markdown(
+
+        '<div class="subtitle">Multi-document scientific literature analysis, evidence validation and adaptive reliability reasoning.</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.divider()
+
+
+
+    # -------------------------
+
+    # MAIN METRICS
+
+    # -------------------------
+
+
+
+    papers_df = read_table("papers")
+
+    claims_df = read_table("claims")
+
+    pairs_df = read_table("claim_pairs")
+
+    graph_df = read_table("evidence_graph_edges")
+
+    gaps_df = read_table("research_gaps")
+
+    relations_df = read_table("relations")
+
+
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+
+
+    with c1:
+
+        st.metric(
+
+            "Scientific Papers",
+
+            len(papers_df),
+
+        )
+
+
+
+    with c2:
+
+        st.metric(
+
+            "Claims",
+
+            len(claims_df),
+
+        )
+
+
+
+    with c3:
+
+        st.metric(
+
+            "Evidence Pairs",
+
+            len(pairs_df),
+
+        )
+
+
+
+    with c4:
+
+        st.metric(
+
+            "Graph Edges",
+
+            len(graph_df),
+
+        )
+
+
+
+    with c5:
+
+        st.metric(
+
+            "Research Gaps",
+
+            len(gaps_df),
+
+        )
+
+
+
+    st.divider()
+
+
+
+    # -------------------------
+
+    # REAL PIPELINE RESULT
+
+    # -------------------------
+
+
+
+    st.subheader("Pipeline Status")
+
+
+
+    pipeline = [
+
+        "PDF Ingestion",
+
+        "Text Cleaning & Chunking",
+
+        "Scientific Entity Extraction",
+
+        "Claim Extraction",
+
+        "Relation Extraction",
+
+        "Semantic Embeddings",
+
+        "Candidate Matching",
+
+        "NLI Validation",
+
+        "AERF Reliability Scoring",
+
+        "Adaptive Updating",
+
+        "Evidence Graph",
+
+        "Temporal Evolution",
+
+        "Research Gap Detection",
+
+    ]
+
+
+
+    cols = st.columns(4)
+
+
+
+    for i, step in enumerate(pipeline):
+
+
+
+        with cols[i % 4]:
+
+
+
+            st.success(
+
+                f"✓ {step}"
+
+            )
+
+
+
+    st.divider()
+
+
+
+    # -------------------------
+
+    # VALIDATION SUMMARY
+
+    # -------------------------
+
+
+
+    st.subheader("Evidence Validation Summary")
+
+
+
+    supports = result_value(
+
+        "phase3",
+
+        "validated_relationships",
+
+        {},
+
+    )
+
+
+
+    if isinstance(supports, dict):
+
+
+
+        labels = {
+
+            "supports": supports.get("supports", 0),
+
+            "contradicts": supports.get("contradicts", 0),
+
+            "neutral": supports.get("neutral", 0),
+
+            "uncertain": supports.get("uncertain", 0),
+
+        }
+
+
+
+        chart_df = pd.DataFrame(
+
+            {
+
+                "Relationship": list(labels.keys()),
+
+                "Count": list(labels.values()),
+
+            }
+
+        )
+
+
+
+        st.bar_chart(
+
+            chart_df.set_index("Relationship")
+
+        )
+
+
+
+    st.divider()
+
+
+
+    # -------------------------
+
+    # ADAPTIVE CHANGES
+
+    # -------------------------
+
+
+
+    st.subheader("Adaptive Reliability Activity")
+
+
+
+    adaptive_changes = result_value(
+
+        "phase3",
+
+        "adaptive_score_changes",
+
+        0,
+
+    )
+
+
+
+    st.metric(
+
+        "Adaptive Score Changes",
+
+        adaptive_changes,
+
+    )
+
+
+
+    st.caption(
+
+        "This represents reliability-state changes recorded by the adaptive reasoning layer."
+
+    )
+
+
+
+
+
+# ============================================================
+
+# CLAIMS
+
+# ============================================================
+
+
+
+elif page == "📄 Scientific Claims":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Scientific Claims</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Claims extracted from the processed scientific literature."
+
+    )
+
+
+
+    claims = read_table("claims")
+
+
+
+    if claims.empty:
+
+
+
+        st.warning(
+
+            "No claims available."
+
+        )
+
+
+
+    else:
+
+
+
+        # -------------------------
+
+        # SEARCH
+
+        # -------------------------
+
+
+
+        search = st.text_input(
+
+            "Search claims",
+
+            placeholder="Search scientific claim text...",
+
+        )
+
+
+
+        if search:
+
+
+
+            claims = claims[
+
+                claims["text"]
+
+                .astype(str)
+
+                .str.contains(
+
+                    search,
+
+                    case=False,
+
+                    na=False,
+
+                )
+
+            ]
+
+
+
+        # -------------------------
+
+        # PAPER FILTER
+
+        # -------------------------
+
+
+
+        if "paper_id" in claims.columns:
+
+
+
+            papers = read_table("papers")
+
+
+
+            if not papers.empty:
+
+
+
+                paper_id_col = first_existing(
+
+                    papers.columns,
+
+                    ["paper_id", "id"],
+
+                )
+
+
+
+                title_col = first_existing(
+
+                    papers.columns,
+
+                    [
+
+                        "title",
+
+                        "paper_title",
+
+                        "name",
+
+                    ],
+
+                )
+
+
+
+                if paper_id_col and title_col:
+
+
+
+                    paper_map = dict(
+
+                        zip(
+
+                            papers[paper_id_col],
+
+                            papers[title_col],
+
+                        )
+
+                    )
+
+
+
+                    claims["Paper"] = claims[
+
+                        "paper_id"
+
+                    ].map(paper_map)
+
+
+
+        # -------------------------
+
+        # SUMMARY
+
+        # -------------------------
+
+
+
+        st.metric(
+
+            "Claims Found",
+
+            len(claims),
+
+        )
+
+
+
+        st.divider()
+
+
+
+        # -------------------------
+
+        # CLAIM CARDS
+
+        # -------------------------
+
+
+
+        for _, row in claims.head(50).iterrows():
+
+
+
+            claim_id = row.get(
+
+                "claim_id",
+
+                "—",
+
+            )
+
+
+
+            text = row.get(
+
+                "text",
+
+                "",
+
+            )
+
+
+
+            paper = row.get(
+
+                "Paper",
+
+                f"Paper {row.get('paper_id', '—')}",
+
+            )
+
+
+
+            with st.container():
+
+
+
+                st.markdown(
+
+                    f"**Claim {claim_id}**"
+
+                )
+
+
+
+                st.write(text)
+
+
+
+                st.caption(
+
+                    f"Source: {paper} • "
+
+                    f"Chunk: {row.get('chunk_id', '—')}"
+
+                )
+
+
+
+                st.divider()
+
+
+
+
+
+# ============================================================
+
+# EVIDENCE RELATIONSHIPS
+
+# ============================================================
+
+
+
+elif page == "🔗 Evidence Relationships":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Evidence Relationships</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Candidate claim relationships validated through semantic/NLI reasoning."
+
+    )
+
+
+
+    pairs = read_table(
+
+        "claim_pairs"
+
+    )
+
+
+
+    claims = read_table(
+
+        "claims"
+
+    )
+
+
+
+    if pairs.empty:
+
+
+
+        st.warning(
+
+            "No claim relationships available."
+
+        )
+
+
+
+    else:
+
+
+
+        # -------------------------
+
+        # LABEL SUMMARY
+
+        # -------------------------
+
+
+
+        label_col = first_existing(
+
+            pairs.columns,
+
+            [
+
+                "validated_as",
+
+                "nli_label",
+
+                "relation",
+
+            ],
+
+        )
+
+
+
+        if label_col:
+
+
+
+            counts = (
+
+                pairs[label_col]
+
+                .astype(str)
+
+                .value_counts()
+
+            )
+
+
+
+            st.bar_chart(counts)
+
+
+
+        st.metric(
+
+            "Relationship Records",
+
+            len(pairs),
+
+        )
+
+
+
+        st.divider()
+
+
+
+        # -------------------------
+
+        # ADD CLAIM TEXT
+
+        # -------------------------
+
+
+
+        if not claims.empty:
+
+
+
+            claim_map = dict(
+
+                zip(
+
+                    claims["claim_id"],
+
+                    claims["text"],
+
+                )
+
+            )
+
+
+
+            if "claim_a_id" in pairs.columns:
+
+
+
+                pairs["Claim A"] = pairs[
+
+                    "claim_a_id"
+
+                ].map(claim_map)
+
+
+
+            if "claim_b_id" in pairs.columns:
+
+
+
+                pairs["Claim B"] = pairs[
+
+                    "claim_b_id"
+
+                ].map(claim_map)
+
+
+
+        # -------------------------
+
+        # FILTER
+
+        # -------------------------
+
+
+
+        if label_col:
+
+
+
+            selected = st.multiselect(
+
+                "Relationship type",
+
+                sorted(
+
+                    pairs[label_col]
+
+                    .dropna()
+
+                    .astype(str)
+
+                    .unique()
+
+                ),
+
+                default=[],
+
+            )
+
+
+
+            if selected:
+
+
+
+                pairs = pairs[
+
+                    pairs[label_col]
+
+                    .astype(str)
+
+                    .isin(selected)
+
+                ]
+
+
+
+        # -------------------------
+
+        # DISPLAY
+
+        # -------------------------
+
+
+
+        display_cols = [
+
+            c for c in [
+
+                "pair_id",
+
+                "claim_a_id",
+
+                "claim_b_id",
+
+                "Claim A",
+
+                "Claim B",
+
+                "cosine_similarity",
+
+                "nli_label",
+
+                "nli_confidence",
+
+                "entity_overlap_score",
+
+                "validated_as",
+
+                "relation_alignment_score",
+
+                "matching_method",
+
+            ]
+
+            if c in pairs.columns
+
+        ]
+
+
+
+        st.dataframe(
+
+            pairs[display_cols]
+
+            if display_cols
+
+            else pairs,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+
+
+# ============================================================
+
+# AERF RELIABILITY
+
+# ============================================================
+
+
+
+elif page == "📊 AERF Reliability":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">AERF Reliability</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Multi-factor evidence reliability assessment."
+
+    )
+
+
+
+    scores = read_table(
+
+        "aerf_scores"
+
+    )
+
+
+
+    history = read_table(
+
+        "aerf_score_history"
+
+    )
+
+
+
+    claims = read_table(
+
+        "claims"
+
+    )
+
+
+
+    if scores.empty:
+
+
+
+        st.warning(
+
+            "No AERF score records available."
+
+        )
+
+
+
+    else:
+
+
+
+        # -------------------------
+
+        # SCORE COLUMN
+
+        # -------------------------
+
+
+
+        score_col = first_existing(
+
+            scores.columns,
+
+            [
+
+                "score",
+
+                "aerf_score",
+
+                "reliability_score",
+
+            ],
+
+        )
+
+
+
+        if score_col:
+
+
+
+            scores[score_col] = pd.to_numeric(
+
+                scores[score_col],
+
+                errors="coerce",
+
+            )
+
+
+
+            valid_scores = scores[
+
+                score_col
+
+            ].dropna()
+
+
+
+            c1, c2, c3 = st.columns(3)
+
+
+
+            with c1:
+
+                st.metric(
+
+                    "Average Reliability",
+
+                    f"{valid_scores.mean():.3f}",
+
+                )
+
+
+
+            with c2:
+
+                st.metric(
+
+                    "Highest",
+
+                    f"{valid_scores.max():.3f}",
+
+                )
+
+
+
+            with c3:
+
+                st.metric(
+
+                    "Lowest",
+
+                    f"{valid_scores.min():.3f}",
+
+                )
+
+
+
+        st.divider()
+
+
+
+        # -------------------------
+
+        # FACTORS
+
+        # -------------------------
+
+
+
+        st.subheader(
+
+            "Reliability Dimensions"
+
+        )
+
+
+
+        factor_names = [
+
+            "Source",
+
+            "Methodology",
+
+            "Corroboration",
+
+            "Contradiction Pressure",
+
+            "Temporal Relevance",
+
+            "Semantic Confidence",
+
+            "Provenance",
+
+        ]
+
+
+
+        st.write(
+
+            "AERF combines evidence characteristics across multiple dimensions."
+
+        )
+
+
+
+        factor_cols = []
+
+
+
+        for name in factor_names:
+
+
+
+            possible = [
+
+                name.lower().replace(" ", "_"),
+
+                name.lower().replace(" ", ""),
+
+            ]
+
+
+
+            found = first_existing(
+
+                scores.columns,
+
+                possible,
+
+            )
+
+
+
+            if found:
+
+                factor_cols.append(found)
+
+
+
+        if factor_cols:
+
+
+
+            factor_data = scores[
+
+                factor_cols
+
+            ].apply(
+
+                pd.to_numeric,
+
+                errors="coerce",
+
+            ).mean()
+
+
+
+            factor_data.index = [
+
+                x.replace("_", " ").title()
+
+                for x in factor_data.index
+
+            ]
+
+
+
+            st.bar_chart(
+
+                factor_data
+
+            )
+
+
+
+        st.divider()
+
+
+
+        # -------------------------
+
+        # CLAIM MAPPING
+
+        # -------------------------
+
+
+
+        if (
+
+            not claims.empty
+
+            and "claim_id" in scores.columns
+
+        ):
+
+
+
+            claim_map = dict(
+
+                zip(
+
+                    claims["claim_id"],
+
+                    claims["text"],
+
+                )
+
+            )
+
+
+
+            scores["Claim"] = scores[
+
+                "claim_id"
+
+            ].map(claim_map)
+
+
+
+        # -------------------------
+
+        # SCORE TABLE
+
+        # -------------------------
+
+
+
+        st.subheader(
+
+            "Claim Reliability Scores"
+
+        )
+
+
+
+        st.dataframe(
+
+            scores,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+        # -------------------------
+
+        # ADAPTIVE HISTORY
+
+        # -------------------------
+
+
+
+        if not history.empty:
+
+
+
+            st.divider()
+
+
+
+            st.subheader(
+
+                "Adaptive Reliability Changes"
+
+            )
+
+
+
+            if (
+
+                "old_score" in history.columns
+
+                and "new_score" in history.columns
+
+            ):
+
+
+
+                chart = history[
+
+                    [
+
+                        "old_score",
+
+                        "new_score",
+
+                    ]
+
+                ].copy()
+
+
+
+                st.line_chart(
+
+                    chart
+
+                )
+
+
+
+            st.dataframe(
+
+                history,
+
+                use_container_width=True,
+
+                hide_index=True,
+
+            )
+
+
+
+
+
+# ============================================================
+
+# EVIDENCE GRAPH
+
+# ============================================================
+
+
+
+elif page == "🕸️ Evidence Graph":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Evidence Graph</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Structured graph connecting scientific claims, entities and evidence."
+
+    )
+
+
+
+    graph = read_table(
+
+        "evidence_graph_edges"
+
+    )
+
+
+
+    if graph.empty:
+
+
+
+        st.warning(
+
+            "No evidence graph edges available."
+
+        )
+
+
+
+    else:
+
+
+
+        c1, c2 = st.columns(2)
+
+
+
+        with c1:
+
+            st.metric(
+
+                "Graph Edges",
+
+                len(graph),
+
+            )
+
+
+
+        with c2:
+
+
+
+            if "edge_type" in graph.columns:
+
+
+
+                st.metric(
+
+                    "Edge Types",
+
+                    graph["edge_type"]
+
+                    .nunique(),
+
+                )
+
+
+
+        st.divider()
+
+
+
+        if "edge_type" in graph.columns:
+
+
+
+            counts = (
+
+                graph["edge_type"]
+
+                .astype(str)
+
+                .value_counts()
+
+            )
+
+
+
+            st.subheader(
+
+                "Edge Distribution"
+
+            )
+
+
+
+            st.bar_chart(
+
+                counts
+
+            )
+
+
+
+        st.subheader(
+
+            "Graph Records"
+
+        )
+
+
+
+        st.dataframe(
+
+            graph,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+
+
+# ============================================================
+
+# TEMPORAL EVOLUTION
+
+# ============================================================
+
+
+
+elif page == "⏳ Temporal Evolution":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Temporal Evidence Evolution</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Tracks how claim reliability changes as evidence relationships are updated."
+
+    )
+
+
+
+    history = read_table(
+
+        "aerf_score_history"
+
+    )
+
+
+
+    snapshots = read_table(
+
+        "knowledge_evolution_snapshots"
+
+    )
+
+
+
+    if not history.empty:
+
+
+
+        st.metric(
+
+            "Reliability Updates",
+
+            len(history),
+
+        )
+
+
+
+        if (
+
+            "old_score" in history.columns
+
+            and "new_score" in history.columns
+
+        ):
+
+
+
+            chart = history[
+
+                [
+
+                    "old_score",
+
+                    "new_score",
+
+                ]
+
+            ].copy()
+
+
+
+            chart.columns = [
+
+                "Previous",
+
+                "Updated",
+
+            ]
+
+
+
+            st.line_chart(
+
+                chart
+
+            )
+
+
+
+        st.subheader(
+
+            "Reliability Update History"
+
+        )
+
+
+
+        st.dataframe(
+
+            history,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+    if not snapshots.empty:
+
+
+
+        st.divider()
+
+
+
+        st.subheader(
+
+            "Knowledge Evolution Snapshots"
+
+        )
+
+
+
+        st.metric(
+
+            "Snapshots",
+
+            len(snapshots),
+
+        )
+
+
+
+        st.dataframe(
+
+            snapshots,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+
+
+# ============================================================
+
+# RESEARCH GAPS
+
+# ============================================================
+
+
+
+elif page == "🔎 Research Gaps":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Research Gaps</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Potential evidence deficiencies identified from the current scientific corpus."
+
+    )
+
+
+
+    gaps = read_table(
+
+        "research_gaps"
+
+    )
+
+
+
+    if gaps.empty:
+
+
+
+        st.warning(
+
+            "No research gaps available."
+
+        )
+
+
+
+    else:
+
+
+
+        st.metric(
+
+            "Detected Research Gaps",
+
+            len(gaps),
+
+        )
+
+
+
+        if "gap_type" in gaps.columns:
+
+
+
+            st.subheader(
+
+                "Gap Types"
+
+            )
+
+
+
+            counts = (
+
+                gaps["gap_type"]
+
+                .astype(str)
+
+                .value_counts()
+
+            )
+
+
+
+            st.bar_chart(
+
+                counts
+
+            )
+
+
+
+        st.divider()
+
+
+
+        # -------------------------
+
+        # GAP CARDS
+
+        # -------------------------
+
+
+
+        description_col = first_existing(
+
+            gaps.columns,
+
+            [
+
+                "description",
+
+                "gap_description",
+
+                "text",
+
+            ],
+
+        )
+
+
+
+        for _, row in gaps.head(50).iterrows():
+
+
+
+            gap_type = row.get(
+
+                "gap_type",
+
+                "Unknown",
+
+            )
+
+
+
+            topic = row.get(
+
+                "topic_key",
+
+                "",
+
+            )
+
+
+
+            description = row.get(
+
+                description_col,
+
+                "",
+
+            ) if description_col else ""
+
+
+
+            with st.expander(
+
+                f"🔎 {gap_type} — {topic}"
+
+            ):
+
+
+
+                st.write(
+
+                    description
+
+                )
+
+
+
+                if "related_claim_ids" in row:
+
+
+
+                    st.caption(
+
+                        f"Related claims: {row['related_claim_ids']}"
+
+                    )
+
+
+
+
+
+# ============================================================
+
+# RELATIONS
+
+# ============================================================
+
+
+
+elif page == "🧬 Extracted Relations":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Extracted Scientific Relations</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    st.caption(
+
+        "Relations extracted from scientific text using the relation-extraction layer."
+
+    )
+
+
+
+    relations = read_table(
+
+        "relations"
+
+    )
+
+
+
+    if relations.empty:
+
+
+
+        st.warning(
+
+            "No extracted relations available."
+
+        )
+
+
+
+    else:
+
+
+
+        st.metric(
+
+            "Extracted Relations",
+
+            len(relations),
+
+        )
+
+
+
+        if "predicate" in relations.columns:
+
+
+
+            st.subheader(
+
+                "Predicates"
+
+            )
+
+
+
+            counts = (
+
+                relations["predicate"]
+
+                .astype(str)
+
+                .value_counts()
+
+            )
+
+
+
+            st.bar_chart(
+
+                counts
+
+            )
+
+
+
+        st.divider()
+
+
+
+        st.dataframe(
+
+            relations,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+
+
+
+
+# ============================================================
+
+# DATABASE EXPLORER
+
+# ============================================================
+
+
+
+elif page == "🗃️ Database Explorer":
+
+
+
+    st.markdown(
+
+        '<div class="section-title">Database Explorer</div>',
+
+        unsafe_allow_html=True,
+
+    )
+
+
+
+    if conn is None:
+
+
+
+        st.error(
+
+            "AERF database could not be opened."
+
+        )
+
+
+
+    else:
+
+
+
+        st.caption(
+
+            f"Database: {selected_db_path.name if selected_db_path else 'Unknown'}"
+
+        )
+
+
+
+        st.metric(
+
+            "Database Tables",
+
+            len(tables),
+
+        )
+
+
+
+        st.divider()
+
+
+
+        selected_table = st.selectbox(
+
+            "Select table",
+
+            tables,
+
+        )
+
+
+
+        data = read_table(
+
+            selected_table,
+
+            1000,
+
+        )
+
+
+
+        st.write(
+
+            f"**Rows:** {len(data):,}  |  "
+
+            f"**Columns:** {len(data.columns):,}"
+
+        )
+
+
+
+        st.dataframe(
+
+            data,
+
+            use_container_width=True,
+
+            hide_index=True,
+
+        )
+
+# ============================================================
+
+# NEW ANALYSIS
+
+# ============================================================
+
+
+
+elif page == "📄 New Analysis":
+
+    st.markdown(
+        '<div class="section-title">New Analysis — Isolated Multi-Paper Sessions</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        "Upload and analyze research papers in an isolated, session-scoped environment. "
+        "Results are strictly scoped to the papers uploaded in this session, leaving the "
+        "original 11-paper database and corpus untouched."
+    )
+
+    from pipeline.session_manager import (
+        create_session,
+        generate_session_id,
+        get_session,
+        get_session_repository,
+        get_session_results,
+        list_sessions,
+        run_session_analysis,
+    )
+
+    # ----------------------------------------------------
+    # SESSION SELECTOR & HISTORY
+    # ----------------------------------------------------
+    all_sessions = list_sessions()
+    session_options = ["➕ Start New Analysis Session"]
+    session_id_map = {"➕ Start New Analysis Session": None}
+
+    for s in all_sessions:
+        sid = s["session_id"]
+        paper_cnt = s.get("paper_count", len(s.get("papers", [])))
+        status_icon = "✅" if s.get("status") == "completed" else ("⏳" if s.get("status") == "processing" else "❌")
+        dt_str = s.get("created_at", "")[:16].replace("T", " ")
+        lbl = f"{status_icon} {sid} ({paper_cnt} paper{'s' if paper_cnt != 1 else ''}) — {dt_str}"
+        session_options.append(lbl)
+        session_id_map[lbl] = sid
+
+    # Active session state management
+    current_active_sid = st.session_state.get("active_session_id")
+    default_idx = 0
+    if current_active_sid:
+        for idx, opt in enumerate(session_options):
+            if session_id_map.get(opt) == current_active_sid:
+                default_idx = idx
+                break
+
+    col_sel, col_act = st.columns([4, 1])
+    with col_sel:
+        selected_option = st.selectbox(
+            "Select Analysis Session",
+            options=session_options,
+            index=default_idx,
+            help="Switch between historical analysis sessions or start a new one.",
+        )
+    with col_act:
+        st.write("")
+        st.write("")
+        if st.button("➕ New Session", use_container_width=True):
+            st.session_state["active_session_id"] = None
+            st.rerun()
+
+    active_session_id = session_id_map.get(selected_option)
+    st.session_state["active_session_id"] = active_session_id
+
+    with st.expander("📜 Session History & Registry", expanded=False):
+        if all_sessions:
+            hist_records = []
+            for s in all_sessions:
+                hist_records.append({
+                    "Session ID": s.get("session_id"),
+                    "Name": s.get("name", ""),
+                    "Status": s.get("status", "completed"),
+                    "Papers": s.get("paper_count", len(s.get("papers", []))),
+                    "Claims": s.get("claim_count", 0),
+                    "Pairs": s.get("pair_count", 0),
+                    "Created At": s.get("created_at", "")[:19].replace("T", " "),
+                })
+            st.dataframe(pd.DataFrame(hist_records), use_container_width=True, hide_index=True)
+        else:
+            st.info("No prior analysis sessions recorded yet. Start a new session below.")
+
+    st.divider()
+
+    # ----------------------------------------------------
+    # MODE 1: UPLOAD & START NEW SESSION
+    # ----------------------------------------------------
+    if active_session_id is None:
+        st.subheader("Start New Analysis Session")
+        st.write("Upload 1 or more PDF research papers to process in an isolated session.")
+
+        session_name_input = st.text_input(
+            "Session Name (Optional)",
+            placeholder="e.g. Subglacial hydrology comparison, Quantum optics review",
+        )
+
+        uploaded_files = st.file_uploader(
+            "Upload PDF research papers",
+            type=["pdf"],
+            accept_multiple_files=True,
+            key="research_pdf_uploader",
+        )
+
+        if uploaded_files:
+            st.success(f"{len(uploaded_files)} PDF file(s) selected for this session.")
+            upload_dir = PROJECT_ROOT / "experiments" / "uploads" / "sessions"
+            upload_dir.mkdir(parents=True, exist_ok=True)
+
+            file_details = []
+            for f in uploaded_files:
+                file_details.append({
+                    "Filename": f.name,
+                    "Size": f"{len(f.getvalue()) / 1024:.1f} KB",
+                    "Ready": "✅ Ready",
+                })
+            st.dataframe(pd.DataFrame(file_details), use_container_width=True, hide_index=True)
+
+            if st.button("🚀 Analyze Uploaded Papers", type="primary", use_container_width=True):
+                progress = st.progress(0)
+                status = st.empty()
+
+                try:
+                    # 1. Generate unique session ID
+                    new_session_id = generate_session_id()
+                    sess_name = session_name_input.strip() or f"Session ({len(uploaded_files)} papers)"
+
+                    # 2. Save uploaded files to session directory
+                    session_upload_dir = upload_dir / new_session_id
+                    session_upload_dir.mkdir(parents=True, exist_ok=True)
+                    saved_paths = []
+                    for f in uploaded_files:
+                        sp = session_upload_dir / f.name
+                        with open(sp, "wb") as out_f:
+                            out_f.write(f.getvalue())
+                        saved_paths.append(sp)
+
+                    # 3. Create isolated database & repository
+                    sid, session_repo = create_session(
+                        session_id=new_session_id,
+                        name=sess_name,
+                    )
+
+                    # 4. Run session analysis with cached pipeline models
+                    def update_progress(pct, msg):
+                        progress.progress(pct)
+                        status.info(msg)
+
+                    p2 = get_phase2_pipeline(session_repo)
+                    p3 = get_phase3_pipeline(session_repo)
+
+                    run_session_analysis(
+                        session_id=new_session_id,
+                        pdf_paths=saved_paths,
+                        phase2_pipeline=p2,
+                        phase3_pipeline=p3,
+                        progress_callback=update_progress,
+                        repo=session_repo,
+                    )
+
+                    st.cache_data.clear()
+                    st.session_state["active_session_id"] = new_session_id
+                    status.success("Analysis completed successfully!")
+                    st.rerun()
+
+                except Exception as exc:
+                    progress.empty()
+                    status.error(f"Analysis failed: {exc}")
+                    st.exception(exc)
+
+    # ----------------------------------------------------
+    # MODE 2: DISPLAY SESSION RESULTS VIEW
+    # ----------------------------------------------------
+    else:
+        results = get_session_results(active_session_id)
+        sess_info = results.get("session_info", {})
+        summary = results.get("summary", {})
+        papers = results.get("papers", [])
+        claims = results.get("claims", [])
+        pairs = results.get("pairs", [])
+        scores = results.get("scores", [])
+        graph_edges = results.get("graph_edges", [])
+        gaps = results.get("gaps", [])
+
+        # Session Header & Badge
+        hdr_col1, hdr_col2 = st.columns([3, 1])
+        with hdr_col1:
+            st.markdown(f"### 🔬 Session Results: `{active_session_id}`")
+            created_dt = sess_info.get("created_at", "")[:19].replace("T", " ")
+            st.caption(f"**Name:** {sess_info.get('name', 'Analysis Session')} • **Created:** {created_dt}")
+        with hdr_col2:
+            st.success(f"Status: {sess_info.get('status', 'Completed').upper()}")
+
+        # Uploaded Papers overview
+        st.markdown("#### 📄 Uploaded Papers in This Session")
+        if papers:
+            paper_rows = []
+            for p in papers:
+                p_claims = [c for c in claims if c.get("paper_id") == p["paper_id"]]
+                paper_rows.append({
+                    "Paper ID": p["paper_id"],
+                    "Filename": p["source_filename"],
+                    "Title": p.get("title") or "—",
+                    "Year": p.get("publication_year") or "—",
+                    "Pages": p.get("page_count") or "—",
+                    "Extracted Claims": len(p_claims),
+                })
+            st.dataframe(pd.DataFrame(paper_rows), use_container_width=True, hide_index=True)
+
+        st.divider()
+
+        # Summary KPI metric cards
+        k1, k2, k3, k4, k5, k6 = st.columns(6)
+        k1.metric("Uploaded Papers", summary.get("total_papers", 0))
+        k2.metric("Extracted Claims", summary.get("total_claims", 0))
+        k3.metric("Evidence Pairs", summary.get("total_pairs", 0))
+        k4.metric("Mean Reliability", f"{summary.get('mean_score', 0.0):.3f}")
+        k5.metric("Graph Edges", summary.get("total_graph_edges", 0))
+        k6.metric("Research Gaps", summary.get("total_gaps", 0))
+
+        st.divider()
+
+        # Tabs for detailed scoped results
+        tab_claims, tab_pairs, tab_scores, tab_graph, tab_gaps = st.tabs([
+            f"📄 Extracted Claims ({len(claims)})",
+            f"🔗 Evidence Relationships ({len(pairs)})",
+            f"📊 AERF Reliability ({len(scores)})",
+            f"🕸️ Evidence Graph ({len(graph_edges)})",
+            f"🔎 Research Gaps ({len(gaps)})",
+        ])
+
+        with tab_claims:
+            st.markdown("##### Scientific Claims Extracted in This Session")
+            if claims:
+                filter_paper = st.selectbox(
+                    "Filter by Paper",
+                    options=["All Papers"] + [p["source_filename"] for p in papers],
+                    key="session_claims_paper_filter",
+                )
+                search_q = st.text_input("Search claims by keyword", key="session_claims_search")
+
+                claims_filtered = claims
+                if filter_paper != "All Papers":
+                    claims_filtered = [c for c in claims_filtered if c.get("source_filename") == filter_paper]
+                if search_q.strip():
+                    q_lower = search_q.strip().lower()
+                    claims_filtered = [c for c in claims_filtered if q_lower in c.get("text", "").lower()]
+
+                st.write(f"Showing **{len(claims_filtered)}** of **{len(claims)}** claims:")
+                claims_display = []
+                for c in claims_filtered:
+                    claims_display.append({
+                        "Claim ID": c.get("claim_id"),
+                        "Paper": c.get("source_filename"),
+                        "Page": c.get("page_number", "—"),
+                        "Claim Text": c.get("text"),
+                    })
+                st.dataframe(pd.DataFrame(claims_display), use_container_width=True, hide_index=True)
+            else:
+                st.info("No claims were extracted for the papers in this session.")
+
+        with tab_pairs:
+            st.markdown("##### Cross-Paper Evidence Relationships")
+            if len(papers) <= 1:
+                st.info(
+                    "ℹ️ **Single-Paper Session**: 1 PDF was uploaded. Claims and baseline "
+                    "reliability scores have been extracted without requiring cross-paper comparisons."
+                )
+            elif pairs:
+                p_sup = summary.get("supports_count", 0)
+                p_con = summary.get("contradicts_count", 0)
+                p_neu = summary.get("neutral_count", 0)
+                st.write(f"**Relationship Summary:** 🟢 Supports: {p_sup} | 🔴 Contradicts: {p_con} | ⚪ Neutral: {p_neu}")
+
+                pairs_display = []
+                for p in pairs:
+                    pairs_display.append({
+                        "Pair ID": p.get("pair_id"),
+                        "Paper A": p.get("paper_a_filename"),
+                        "Claim A": p.get("claim_a_text"),
+                        "Paper B": p.get("paper_b_filename"),
+                        "Claim B": p.get("claim_b_text"),
+                        "NLI Label": p.get("nli_label"),
+                        "Confidence": f"{float(p.get('nli_confidence') or 0):.2f}",
+                        "Cosine Sim": f"{float(p.get('cosine_similarity') or 0):.2f}",
+                        "Validated As": p.get("validated_as"),
+                    })
+                st.dataframe(pd.DataFrame(pairs_display), use_container_width=True, hide_index=True)
+            else:
+                st.info(
+                    "No cross-paper claim pairs met the semantic similarity threshold "
+                    "between the papers in this session."
+                )
+
+        with tab_scores:
+            st.markdown("##### AERF Reliability Scores (Session-Scoped)")
+            if scores:
+                scores_display = []
+                for s in scores:
+                    fb = s.get("factor_breakdown") or {}
+                    scores_display.append({
+                        "Claim ID": s.get("claim_id"),
+                        "Paper": s.get("source_filename"),
+                        "Claim Text": s.get("claim_text"),
+                        "AERF Score": f"{float(s.get('score') or 0):.4f}",
+                        "Source": f"{float(fb.get('source') or 0):.2f}",
+                        "Methodology": f"{float(fb.get('methodology') or 0):.2f}",
+                        "Corroboration": f"{float(fb.get('corroboration') or 0):.2f}",
+                        "Contradiction": f"{float(fb.get('contradiction') or 0):.2f}",
+                        "Temporal": f"{float(fb.get('temporal') or 0):.2f}",
+                        "Semantic": f"{float(fb.get('semantic') or 0):.2f}",
+                        "Provenance": f"{float(fb.get('provenance') or 0):.2f}",
+                    })
+                st.dataframe(pd.DataFrame(scores_display), use_container_width=True, hide_index=True)
+            else:
+                st.info("No reliability scores recorded for this session.")
+
+        with tab_graph:
+            st.markdown("##### Evidence Graph (Session-Scoped)")
+            if graph_edges:
+                st.write(f"**Total Graph Edges:** {len(graph_edges)}")
+                edges_display = []
+                for e in graph_edges:
+                    edges_display.append({
+                        "Edge ID": e.get("edge_id"),
+                        "Source Type": e.get("source_node_type"),
+                        "Source ID": e.get("source_node_id"),
+                        "Target Type": e.get("target_node_type"),
+                        "Target ID": e.get("target_node_id"),
+                        "Edge Type": e.get("edge_type"),
+                        "Weight": f"{float(e.get('weight') or 0):.2f}",
+                    })
+                st.dataframe(pd.DataFrame(edges_display), use_container_width=True, hide_index=True)
+            else:
+                st.info("No graph edges recorded for this session.")
+
+        with tab_gaps:
+            st.markdown("##### Research Gaps (Session-Scoped)")
+            if gaps:
+                st.write(f"**Total Gaps Detected:** {len(gaps)}")
+                gaps_display = []
+                for g in gaps:
+                    gaps_display.append({
+                        "Gap ID": g.get("gap_id"),
+                        "Topic": g.get("topic_key"),
+                        "Gap Type": g.get("gap_type"),
+                        "Description": g.get("description"),
+                        "Related Claim IDs": str(g.get("related_claim_ids")),
+                    })
+                st.dataframe(pd.DataFrame(gaps_display), use_container_width=True, hide_index=True)
+            else:
+                st.info("No research gaps detected among the claims in this session.")
+
+
+
+
+
+
+# ============================================================
+
+# FOOTER
+
+# ============================================================
+
+
+
+st.divider()
+
+
+
+st.caption(
+
+    "AERF Engine • Adaptive Evidence Reliability & Reasoning • "
+
+    "Research prototype"
+
+)

@@ -1,0 +1,5 @@
+sentence,label,paper_id,category,is_synthetic,annotation_rationale
+Our synthetic model achieves a 99.5% accuracy on benchmark test suite Alpha.,1,SYNTHETIC_TEST_FIXTURE_1,finding,True,Synthetic positive claim generated solely for smoke/unit testing.
+Synthetic evaluation reveals that treatment X produced a statistically significant reduction in synthetic metric Y.,1,SYNTHETIC_TEST_FIXTURE_1,statistical_result,True,Synthetic positive finding generated solely for smoke/unit testing.
+We trained the synthetic neural network using stochastic gradient descent for 10 epochs.,0,SYNTHETIC_TEST_FIXTURE_2,methodology,True,Synthetic method sentence generated solely for smoke/unit testing.
+The synthetic corpus consists of 500 artificial documents generated with random seed 42.,0,SYNTHETIC_TEST_FIXTURE_2,dataset_description,True,Synthetic dataset description generated solely for smoke/unit testing.

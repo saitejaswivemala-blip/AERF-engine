@@ -1,0 +1,280 @@
+"""
+claim_extractor.py
+
+Finds sentences that report a scientific result / finding / conclusion.
+
+Why the old version failed on AI/ML papers
+------------------------------------------
+1. It trusted ONE zero-shot label per sentence. Real findings such as
+   "Experiments show our model significantly improves accuracy" were scored as
+   "methodology" (0.46) or "background", so they were thrown away.
+2. The eligibility gate required a spaCy VERB/AUX tag. SciSpaCy often tags
+   title/abstract text from PDFs (missing spaces, glued headings) with no verb,
+   so whole chunks had 0 eligible sentences.
+3. spaCy splits sentences on "et al." / "Fig." and does not split glued text
+   like "models.The".
+
+What this version does
+----------------------
+- Cleaner sentence spans (merge abbreviation fragments, split glued sentences,
+  skip glued headings) with exact character offsets into the input text.
+- Lenient but safe eligibility (length, words, letters, not a reference/caption).
+- Zero-shot with clearer labels + hypothesis template, using ALL 4 label scores.
+- A sentence is accepted when:
+    (a) the zero-shot top label is "finding" and score >= threshold, OR
+    (b) it contains a RESULT cue (e.g. "outperforms", "achieves 28.4 BLEU",
+        "show that ... improves") and the model does not strongly say
+        method/background/irrelevant. Background-style sentences (citations,
+        "prior work") and method-style openings ("We trained ...") need
+        stronger evidence.
+  The threshold is NOT lowered; cues only rescue sentences with real result
+  language.
+
+Public interface is unchanged: ClaimResult(text,start,end,score,label) and
+ScientificClaimExtractor.extract(text) -> list[ClaimResult].
+"""
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ClaimResult:
+    text: str
+    start: int
+    end: int
+    score: float
+    label: str = "scientific_finding"
+    reason: str = "zero_shot"   # extra, optional: "zero_shot" | "result_cue" | "contribution_cue"
+
+
+# ---------------------------------------------------------------- patterns
+_ABBREV_END = re.compile(
+    r"(?:\bet al|\bFigs?|\bEqs?|\bTabs?|\bSecs?|\bvs|\bi\.e|\be\.g|\bcf|\bapprox|\bca|"
+    r"\bresp|\bNo|\bNos|\bDr|\bProf|\bRefs?|\betc|\bwt|\bvol|\bpp)\.$", re.I)
+_HEADING_PREFIX = re.compile(
+    r"^\s*(?:\d+(?:\.\d+)*\.?\s*)?(?i:abstract|introduction|conclusions?|results(?: and discussion)?|"
+    r"discussion|background|methods?|summary)\s*[:\-\u2013.]?\s*(?=[A-Z])")
+_GLUED = re.compile(r"(?<=[a-z0-9\)\]])([.!?])(?=[A-Z][a-z]{2,})")
+
+_REFERENCE_LIKE = re.compile(
+    r"(?:arxiv preprint|in proceedings|proceedings of|\bpp\.\s*\d|^\s*\[\d+\]|doi:|https?://|www\.|"
+    r"@\w+\.\w+|\bet al\.,?\s*\d{4}.*\bet al\.,?\s*\d{4}|^\s*(?:table|figure|fig\.)\s*\d)", re.I)
+
+_VERB_FALLBACK = re.compile(
+    r"\b(?:is|are|was|were|be|been|has|have|had|can|could|may|might|will|would|do|does|did|"
+    r"\w+(?:ed|es|ing)|show\w*|achiev\w*|improv\w*|outperform\w*|obtain\w*|yield\w*|"
+    r"propos\w*|introduc\w*|present\w*|find|found|suggest\w*|indicat\w*)\b", re.I)
+
+# --- RESULT cues (strong)
+_STRONG = [re.compile(p, re.I) for p in (
+    r"\b(?:outperform|surpass|exceed|beat)(?:s|ed|ing)?\b",
+    r"\bstate[- ]of[- ]the[- ]art\b|\bSOTA\b",
+    r"\b(?:achiev|obtain|attain|reach|yield|produc)\w*\b[^.]{0,50}(?:\d|score|accuracy|bleu|f1|improvement|results?|performance|error)",
+    r"\b(?:improv|reduc|increas|decreas|boost|lower|rais)\w*\b[^.]{0,60}(?:\bover\b|\bby\b|accuracy|performance|\d|%|baseline|significantly|error)",
+    r"\b(?:show|shows|showed|shown|demonstrat\w*|reveal\w*|indicat\w*|confirm\w*|suggest\w*|establish\w*)\s+"
+    r"(?:that|these|those|our|the|a significant|significant|superior|substantial)\b",
+    r"\b(?:significantly|substantially|consistently)\s+(?:higher|lower|better|worse|improv\w*|reduc\w*|increas\w*|outperform\w*|faster)",
+    r"\bsuperior (?:in|to)\b|\bbetter than\b|\b(?:higher|lower|faster) than\b",
+    r"\bp\s*[<=\u2264]\s*0?\.\d+|\b(?:odds|hazard|risk|rate) ratio\b|\b95\s?% ?(?:ci|confidence)\b",
+    r"\b(?:was|were) (?:significantly )?(?:associated|correlated) with\b",
+    r"\bwe (?:find|found|observe[d]?|conclude[d]?|demonstrate[d]?|report|show|showed)\b",
+    r"\bin conclusion\b|\bour (?:results|findings|experiments|analysis)\b",
+)]
+_METRIC_NUMBER = re.compile(
+    r"\b(?:bleu|f1|f-score|accuracy|auc|precision|recall|perplexity|rouge|exact match|em|"
+    r"top-?[15]|error rate|score)\b[^.]{0,30}\d|\b\d+(?:\.\d+)?\s?%", re.I)
+# contribution statement ("We propose a new simple architecture ...")
+_CONTRIBUTION = re.compile(
+    r"\bwe (?:propose|introduce|present|develop|design)\b[^.]{0,40}\b(?:new|novel|simple|efficient|first|general)\b", re.I)
+
+_METHOD_LEAD = re.compile(
+    r"^\W*(?:we|the (?:model|network|system|encoder|decoder)|our (?:model|approach|system))\s+"
+    r"(?:use|used|using|train|trained|employ|employed|apply|applied|follow|followed|implement|implemented|"
+    r"set|fine-?tune[d]?|adopt|adopted|consist|collect|collected|describe|split|initiali[sz]e[d]?|"
+    r"optimi[sz]e[d]?|evaluate[d]?|compute[d]?|sample[d]?|tokeni[sz]e[d]?)\b", re.I)
+_BACKGROUND_MARK = re.compile(
+    r"\bet al\b|\[\d+(?:[,\u2013-]\s*\d+)*\]|\bprevious (?:work|studies|research)\b|\bprior work\b|"
+    r"\brecent(?:ly)? (?:studies|work|advances)\b|\bhas been shown\b|\bhave been shown\b|"
+    r"\bwidely (?:used|adopted|studied)\b|\btraditionally\b|\bhave dominated\b", re.I)
+_FIRST_PERSON = re.compile(r"\b(?:we|our|ours|this (?:paper|work|study)|here,? we)\b", re.I)
+
+_MAX_CLASSIFY_CHARS = 700
+
+
+class ScientificClaimExtractor:
+    """Zero-shot classifier + conservative result-cue rescue (see module doc)."""
+
+    # Index 0 MUST stay the "finding" label (the pipeline/tests rely on it).
+    LABELS = (
+        "reports a result, finding, or conclusion",
+        "describes background or prior work",
+        "describes the method, model, or experimental setup",
+        "is other or irrelevant text",
+    )
+    HYPOTHESIS_TEMPLATE = "This sentence {}."
+
+    def __init__(self, model_name="valhalla/distilbart-mnli-12-3", threshold=0.55,
+                 nlp=None, classifier=None):
+        self.model_name = model_name
+        self.threshold = float(threshold)
+        self._nlp = nlp
+        self._classifier = classifier
+
+    # ------------------------------------------------------------ models
+    def _classifier_instance(self):
+        if self._classifier is None:
+            from transformers import pipeline
+            self._classifier = pipeline("zero-shot-classification", model=self.model_name)
+        return self._classifier
+
+    def _doc(self, text):
+        if self._nlp is None:
+            import spacy
+            self._nlp = spacy.load("en_core_sci_sm")
+        return self._nlp(text)
+
+    # ------------------------------------------------------ sentence spans
+    @staticmethod
+    def _has_verb_pos(sent) -> bool:
+        try:
+            return any(t.pos_ in {"VERB", "AUX"} for t in sent)
+        except TypeError:
+            return False
+
+    def _spans(self, text, doc):
+        """Return [(start, end, has_verb_pos)] with offsets into `text`."""
+        raw = []
+        for s in doc.sents:
+            raw.append([int(s.start_char), int(s.end_char), self._has_verb_pos(s)])
+        # merge fragments created by abbreviations ("et al.", "Fig.") or lowercase starts
+        merged = []
+        for st, en, vb in raw:
+            if merged:
+                prev = text[merged[-1][0]:merged[-1][1]].rstrip()
+                cur = text[st:en].lstrip()
+                if _ABBREV_END.search(prev) or (cur[:1].islower()):
+                    merged[-1][1] = en
+                    merged[-1][2] = merged[-1][2] or vb
+                    continue
+            merged.append([st, en, vb])
+        # split glued sentences ("...quality.The model...")
+        out = []
+        for st, en, vb in merged:
+            seg = text[st:en]
+            cut = st
+            for m in _GLUED.finditer(seg):
+                before = seg[:m.end(1)]
+                if _ABBREV_END.search(before):
+                    continue
+                out.append((cut, st + m.end(1), vb))
+                cut = st + m.end(1)
+            out.append((cut, en, vb))
+        # trim whitespace + glued heading prefix, keeping exact offsets
+        final = []
+        for st, en, vb in out:
+            seg = text[st:en]
+            lead = len(seg) - len(seg.lstrip())
+            h = _HEADING_PREFIX.match(seg)
+            if h and h.end() < len(seg) - 20:
+                lead = max(lead, h.end())
+            st2 = st + lead
+            en2 = en - (len(seg) - len(seg.rstrip()))
+            if en2 > st2:
+                final.append((st2, en2, vb))
+        return final
+
+    # ----------------------------------------------------------- eligibility
+    @staticmethod
+    def _eligible_text(s: str, has_verb_pos: bool) -> bool:
+        s = s.strip()
+        if len(s) < 25 or len(s.split()) < 5:
+            return False
+        letters = sum(ch.isalpha() for ch in s)
+        if letters / len(s) < 0.55:
+            return False
+        if _REFERENCE_LIKE.search(s):
+            return False
+        return has_verb_pos or bool(_VERB_FALLBACK.search(s))
+
+    # backward-compatible helper (kept for any external caller)
+    @staticmethod
+    def _eligible(sent) -> bool:
+        return ScientificClaimExtractor._eligible_text(
+            sent.text, ScientificClaimExtractor._has_verb_pos(sent))
+
+    # ------------------------------------------------------------ decision
+    @classmethod
+    def cue_strength(cls, s: str) -> str:
+        """'strong' | 'contribution' | 'none' -- looks at wording only."""
+        method_lead = bool(_METHOD_LEAD.search(s))
+        if any(p.search(s) for p in _STRONG):
+            return "strong"
+        if _METRIC_NUMBER.search(s) and not method_lead:
+            return "strong"
+        if _CONTRIBUTION.search(s):
+            return "contribution"
+        return "none"
+
+    def decide(self, s: str, probs: dict):
+        """probs: {label: score}. Returns (accept, score, reason)."""
+        f = probs.get(self.LABELS[0], 0.0)
+        bg = probs.get(self.LABELS[1], 0.0)
+        me = probs.get(self.LABELS[2], 0.0)
+        ir = probs.get(self.LABELS[3], 0.0)
+        top = max(probs, key=probs.get)
+        method_lead = bool(_METHOD_LEAD.search(s))
+        cue = self.cue_strength(s)
+        background_style = bool(_BACKGROUND_MARK.search(s)) and not _FIRST_PERSON.search(s)
+
+        if top == self.LABELS[0] and f >= self.threshold:
+            # a bare method sentence the model over-trusted needs real evidence
+            if method_lead and cue == "none" and f < 0.80:
+                return False, f, "method_lead"
+            return True, f, "zero_shot"
+        if ir >= 0.40 or top == self.LABELS[3]:
+            return False, f, "irrelevant"
+        if cue == "strong" and not background_style and not method_lead and f >= 0.15 and me < 0.85 and bg < 0.85:
+            return True, f, "result_cue"
+        if cue == "strong" and method_lead and f >= 0.30 and me < 0.85:
+            return True, f, "result_cue"
+        if cue == "contribution" and not background_style and f >= 0.10 and bg < 0.85 and me < 0.85:
+            return True, f, "contribution_cue"
+        return False, f, "rejected"
+
+    # ------------------------------------------------------------ classify
+    def _classify(self, classifier, texts):
+        def call(x):
+            try:
+                return classifier(x, list(self.LABELS), multi_label=False,
+                                  hypothesis_template=self.HYPOTHESIS_TEMPLATE)
+            except TypeError:  # simple classifiers (tests/fakes) without that kwarg
+                return classifier(x, list(self.LABELS), multi_label=False)
+        try:
+            outs = call(texts)
+            if isinstance(outs, dict):
+                outs = [outs]
+            if len(outs) != len(texts):
+                raise ValueError("batch size mismatch")
+        except Exception:
+            outs = [call(t) for t in texts]
+        return outs
+
+    def extract(self, text: str) -> list[ClaimResult]:
+        doc = self._doc(text)
+        spans = [(st, en) for st, en, vb in self._spans(text, doc)
+                 if self._eligible_text(text[st:en], vb)]
+        if not spans:
+            return []
+        classifier = self._classifier_instance()
+        inputs = [text[st:en][:_MAX_CLASSIFY_CHARS] for st, en in spans]
+        outs = self._classify(classifier, inputs)
+        results = []
+        for (st, en), r in zip(spans, outs):
+            probs = {l: float(sc) for l, sc in zip(r["labels"], r["scores"])}
+            ok, score, reason = self.decide(text[st:en], probs)
+            if ok:
+                # exact substring of the Phase-1 chunk: text[start:end] == claim.text
+                results.append(ClaimResult(text[st:en], st, en, score, reason=reason))
+        return results

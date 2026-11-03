@@ -1,0 +1,138 @@
+[
+  {
+    "pair_id": "gt_01",
+    "paper_a": "P1",
+    "paper_b": "P2",
+    "claim_a": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+    "claim_b": "After adjusting for cluster randomisation, vitamin D supplementation had no statistically significant effect on acute respiratory infection risk in the Blue Sky trial (odds ratio 0.58, 95% CI 0.26 to 1.29).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "supports",
+    "human_notes": "Both null-result findings on the same overall question (independent corroboration of no protective effect), from different trial data.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_02",
+    "paper_a": "P1",
+    "paper_b": "P3",
+    "claim_a": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+    "claim_b": "A population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause acute respiratory infection in UK adults (OR 1.09-1.26).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "supports",
+    "human_notes": "Both null-result findings for ARI prevention in adults; corroborating.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_03",
+    "paper_a": "P2",
+    "paper_b": "P3",
+    "claim_a": "After adjusting for cluster randomisation, vitamin D supplementation had no statistically significant effect on acute respiratory infection risk in the Blue Sky trial (odds ratio 0.58, 95% CI 0.26 to 1.29).",
+    "claim_b": "A population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause acute respiratory infection in UK adults (OR 1.09-1.26).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "supports",
+    "human_notes": "Independent null results, different populations (Mongolian schoolchildren vs UK adults) but corroborating on the core question of no protective effect.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_04",
+    "paper_a": "P1",
+    "paper_b": "P5",
+    "claim_a": "In the subgroup aged 1.00 to 15.99 years receiving daily vitamin D dosing, supplementation showed a statistically significant protective effect against acute respiratory infection (OR 0.74, 95% CI 0.60 to 0.92).",
+    "claim_b": "Vitamin D supplementation did not significantly reduce acute respiratory infection incidence in pediatric populations (RR 0.82, 95% CI 0.64 to 1.06).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "neutral",
+    "human_notes": "Overlapping but non-identical population/condition definitions: P1 is a narrow daily-dosing RCT subgroup within a prevention-only meta-analysis; P5 pools prevention AND treatment pediatric trials with mixed dosing regimens. The confidence intervals are not clearly incompatible. A careful annotator does not call this a clean contradiction.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_05",
+    "paper_a": "P4",
+    "paper_b": "P1",
+    "claim_a": "In a meta-analysis of 18 RCTs, vitamin D supplements had a statistically significant beneficial effect in the TREATMENT of acute respiratory infections (RR 1.07, 95% CI 1.01 to 1.13).",
+    "claim_b": "Vitamin D supplementation for PREVENTION of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "neutral",
+    "human_notes": "Different clinical questions (treatment of an existing infection vs prevention of a future one); not directly comparable, should not be scored as agreement or disagreement.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_06",
+    "paper_a": "P4",
+    "paper_b": "P5",
+    "claim_a": "In a meta-analysis of 18 RCTs, vitamin D supplements had a statistically significant beneficial effect in the TREATMENT of acute respiratory infections (RR 1.07, 95% CI 1.01 to 1.13).",
+    "claim_b": "Vitamin D supplementation did not significantly reduce acute respiratory infection incidence in pediatric populations (RR 0.82, 95% CI 0.64 to 1.06).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "neutral",
+    "human_notes": "Different population (general/mixed-age vs pediatric-only) and different outcome framing (treatment effect vs prevention incidence); not a clean comparable pair.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_07",
+    "paper_a": "P1",
+    "paper_b": "P1",
+    "claim_a": "A 2021 meta-analysis of 37 RCTs found a statistically significant protective effect of vitamin D supplementation against acute respiratory infection (OR 0.92, 95% CI 0.86 to 0.99).",
+    "claim_b": "An updated 2024 meta-analysis of the same trials plus new data found vitamin D supplementation did not significantly affect overall acute respiratory infection risk (OR 0.94, 95% CI 0.88 to 1.00).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "contradicts",
+    "human_notes": "Both claims are drawn from within P1 itself (it describes its own 2021 predecessor result before presenting its 2024 update). A genuine, documented case of a conclusion flipping from significant to non-significant as evidence accrued -- valuable for the adaptive-AERF/knowledge-evolution experiment (Section 8), not just static matching.",
+    "annotator": "claude-technical-audit-session"
+  },
+  {
+    "pair_id": "gt_08",
+    "paper_a": "P1",
+    "paper_b": "P1",
+    "claim_a": "In trials administering vitamin D daily, there was a statistically significant protective effect against acute respiratory infection (OR 0.84, 95% CI 0.73 to 0.97).",
+    "claim_b": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect across all dosing regimens (OR 0.94, 95% CI 0.88 to 1.00).",
+    "source_span_a": {
+      "note": "manually identified in fetched full text/abstract; exact chunk/char offsets require running real Phase 2 claim extraction, not yet possible in this sandbox (see report)"
+    },
+    "source_span_b": {
+      "note": "see source_span_a"
+    },
+    "system_prediction": null,
+    "human_label": "neutral",
+    "human_notes": "Subgroup-vs-overall relationship within the same paper, not a contradiction: the overall null result is consistent with a subgroup showing a real but diluted-when-pooled effect.",
+    "annotator": "claude-technical-audit-session"
+  }
+]

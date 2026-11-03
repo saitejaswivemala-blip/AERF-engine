@@ -1,0 +1,14 @@
+Metric_Name,Database_Table_or_Source,SQL_or_Method,Count_Value,Scope_and_Notes
+Uploaded Papers,papers,SELECT COUNT(*) FROM papers,2,GlobalCropYield.pdf (ID:1) and SageMICpaper2020.pdf (ID:2)
+Total Chunks,chunks,SELECT COUNT(*) FROM chunks,1200,600 chunks per paper (1200 processed)
+Extracted Claims,claims,SELECT COUNT(*) FROM claims,400,"Paper 1: 179, Paper 2: 221"
+Claim Entities,claim_entities,SELECT COUNT(*) FROM claim_entities,2861,Entities linked directly to claim spans
+Extracted Relations,relations,SELECT COUNT(*) FROM relations,115,Entity-predicate-entity dependency parse relations
+Evidence Pairs,claim_pairs,SELECT COUNT(*) FROM claim_pairs,815,All 815 are cross-paper pairs between Paper 1 and 2
+Graph Edges (Raw in Table),evidence_graph_edges,SELECT COUNT(*) FROM evidence_graph_edges,4542,Displayed in Overview & Evidence Graph
+Graph Edges (Session Scoped),evidence_graph_edges,SELECT COUNT(*) WHERE source_node='claim' OR target_node='claim',4427,Displayed in New Analysis KPI (filters out 115 entity-entity edges)
+Research Gaps,research_gaps,SELECT COUNT(*) FROM research_gaps,333,Candidate uncorroborated & contradictory findings
+Total AERF Scores Stored,aerf_scores,SELECT COUNT(*) FROM aerf_scores,556,556 total rows (400 current + 156 historical updates)
+Current Claim Scores,aerf_scores,SELECT COUNT(*) FROM aerf_scores WHERE is_current=1,400,Exactly matches 400 extracted claims
+Historical Score Snapshots,aerf_scores,SELECT COUNT(*) FROM aerf_scores WHERE is_current=0,156,Pre-update scores archived during adaptive updates
+Temporal Updates Logged,aerf_score_history,SELECT COUNT(*) FROM aerf_score_history,56,Neighborhood transitions exceeding epsilon=0.001

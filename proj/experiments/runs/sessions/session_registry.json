@@ -1,0 +1,346 @@
+{
+  "session_20261026_084758_79f7cf": {
+    "session_id": "session_20261026_084758_79f7cf",
+    "name": "Session Oct 26, 2026 08:47",
+    "created_at": "2026-10-26T08:47:58.562486",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpaqqzuawv\\session_20261026_084758_79f7cf.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_084836_09bbe1": {
+    "session_id": "session_20261026_084836_09bbe1",
+    "name": "Session Oct 26, 2026 08:48",
+    "created_at": "2026-10-26T08:48:36.399792",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpo008w61o\\session_20261026_084836_09bbe1.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_085110_2b3f85": {
+    "session_id": "session_20261026_085110_2b3f85",
+    "name": "Session Oct 26, 2026 08:51",
+    "created_at": "2026-10-26T08:51:10.795192",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpbj22bh8r\\session_20261026_085110_2b3f85.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_143334_0506e4": {
+    "session_id": "session_20261026_143334_0506e4",
+    "name": "Session Oct 26, 2026 14:33",
+    "created_at": "2026-10-26T14:33:34.384225",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmp0d06zibl\\session_20261026_143334_0506e4.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_143624_d2a066": {
+    "session_id": "session_20261026_143624_d2a066",
+    "name": "Session Oct 26, 2026 14:36",
+    "created_at": "2026-10-26T14:36:24.924356",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpi4ln6z8z\\session_20261026_143624_d2a066.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_182922_b04beb": {
+    "session_id": "session_20261026_182922_b04beb",
+    "name": "AERF_Two_Paper_Test",
+    "created_at": "2026-10-26T18:29:23.154228",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\experiments\\runs\\sessions\\session_20261026_182922_b04beb.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "ooae021 (1).pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "2020.emnlp-main.609 (2).pdf"
+      }
+    ]
+  },
+  "session_20261026_191332_ed70b4": {
+    "session_id": "session_20261026_191332_ed70b4",
+    "name": "Session Oct 26, 2026 19:13",
+    "created_at": "2026-10-26T19:13:32.283566",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpmktxq_bv\\session_20261026_191332_ed70b4.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_191816_5e3150": {
+    "session_id": "session_20261026_191816_5e3150",
+    "name": "Session Oct 26, 2026 19:18",
+    "created_at": "2026-10-26T19:18:16.593609",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpu50hi20f\\session_20261026_191816_5e3150.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_193725_1854fc": {
+    "session_id": "session_20261026_193725_1854fc",
+    "name": "Session Oct 26, 2026 19:37",
+    "created_at": "2026-10-26T19:37:25.330162",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpq86kygva\\session_20261026_193725_1854fc.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_195028_9ea483": {
+    "session_id": "session_20261026_195028_9ea483",
+    "name": "Session Oct 26, 2026 19:50",
+    "created_at": "2026-10-26T19:50:28.281101",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpm5vxz9aq\\session_20261026_195028_9ea483.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261026_200358_7b3692": {
+    "session_id": "session_20261026_200358_7b3692",
+    "name": "Session Oct 26, 2026 20:03",
+    "created_at": "2026-10-26T20:03:58.491059",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpb91s7fh5\\session_20261026_200358_7b3692.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261028_170637_50da2a": {
+    "session_id": "session_20261028_170637_50da2a",
+    "name": "Session Oct 28, 2026 17:06",
+    "created_at": "2026-10-28T17:06:37.268740",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmp84y44c9f\\session_20261028_170637_50da2a.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261028_171133_5bfcd1": {
+    "session_id": "session_20261028_171133_5bfcd1",
+    "name": "crop_yield",
+    "created_at": "2026-10-28T17:11:34.260477",
+    "status": "created",
+    "db_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\experiments\\runs\\sessions\\session_20261028_171133_5bfcd1.db",
+    "paper_count": 0,
+    "papers": []
+  },
+  "session_20261028_172113_05bbfe": {
+    "session_id": "session_20261028_172113_05bbfe",
+    "name": "Session Oct 28, 2026 17:21",
+    "created_at": "2026-10-28T17:21:14.131051",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpdve1ujmx\\session_20261028_172113_05bbfe.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261028_172541_f842d6": {
+    "session_id": "session_20261028_172541_f842d6",
+    "name": "CropYield",
+    "created_at": "2026-10-28T17:25:41.703168",
+    "status": "created",
+    "db_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\experiments\\runs\\sessions\\session_20261028_172541_f842d6.db",
+    "paper_count": 0,
+    "papers": []
+  },
+  "session_20261028_173527_bb5398": {
+    "session_id": "session_20261028_173527_bb5398",
+    "name": "Session (2 papers)",
+    "created_at": "2026-10-28T17:35:27.658285",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\experiments\\runs\\sessions\\session_20261028_173527_bb5398.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "GlobalCropYield.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "SageMICpaper2020.pdf"
+      }
+    ],
+    "error_message": null
+  },
+  "session_20261028_174739_f91d28": {
+    "session_id": "session_20261028_174739_f91d28",
+    "name": "Session (2 papers)",
+    "created_at": "2026-10-28T17:47:40.180785",
+    "status": "created",
+    "db_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\experiments\\runs\\sessions\\session_20261028_174739_f91d28.db",
+    "paper_count": 0,
+    "papers": []
+  },
+  "session_20261028_180301_44d476": {
+    "session_id": "session_20261028_180301_44d476",
+    "name": "Session Oct 28, 2026 18:03",
+    "created_at": "2026-10-28T18:03:01.217781",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmprn10fma7\\session_20261028_180301_44d476.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261028_181115_dae119": {
+    "session_id": "session_20261028_181115_dae119",
+    "name": "Session Oct 28, 2026 18:11",
+    "created_at": "2026-10-28T18:11:16.179812",
+    "status": "failed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmpvrfoxqy0\\session_20261028_181115_dae119.db",
+    "paper_count": 0,
+    "papers": [],
+    "error_message": "TestSessionIsolation.test_run_session_analysis_workflow_with_real_pdf.<locals>.MockPhase2.run() got an unexpected keyword argument 'progress_callback'"
+  },
+  "session_20261028_181210_3e3fa6": {
+    "session_id": "session_20261028_181210_3e3fa6",
+    "name": "Session Oct 28, 2026 18:12",
+    "created_at": "2026-10-28T18:12:11.037647",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmp22de2yhf\\session_20261028_181210_3e3fa6.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  },
+  "session_20261028_181235_f15da9": {
+    "session_id": "session_20261028_181235_f15da9",
+    "name": "Session Oct 28, 2026 18:12",
+    "created_at": "2026-10-28T18:12:35.286972",
+    "status": "completed",
+    "db_path": "C:\\Users\\tejas\\AppData\\Local\\Temp\\tmp3bcpjltl\\session_20261028_181235_f15da9.db",
+    "paper_count": 2,
+    "papers": [
+      {
+        "paper_id": 1,
+        "source_filename": "session_doc1.pdf"
+      },
+      {
+        "paper_id": 2,
+        "source_filename": "session_doc2.pdf"
+      }
+    ]
+  }
+}

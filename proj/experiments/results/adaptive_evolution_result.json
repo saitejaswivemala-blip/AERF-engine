@@ -1,0 +1,113 @@
+{
+  "seed_claim_id": 1,
+  "seed_claim_text": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+  "transitions": [
+    {
+      "step": "initial_evidence",
+      "claim_id": 1,
+      "score": 0.37,
+      "factors": {
+        "source": 0.5,
+        "methodology": 0.3,
+        "corroboration": 0.0,
+        "contradiction": 0.0,
+        "temporal": 1.0,
+        "semantic": 0.5,
+        "provenance": 1.0
+      },
+      "evidence_added": null,
+      "evidence_type": null,
+      "note": "Baseline AERF score for the seed claim (P1's overall null result) before any cross-document evidence is linked."
+    },
+    {
+      "step": "new_supporting_evidence",
+      "claim_id": 1,
+      "score": 0.46122895277207393,
+      "factors": {
+        "contradiction": 0.0,
+        "corroboration": 0.1786447638603696,
+        "methodology": 0.3,
+        "provenance": 1.0,
+        "semantic": 0.87,
+        "source": 0.5,
+        "temporal": 1.0
+      },
+      "evidence_added": "P2 (Bolland 2022) independent null-result reanalysis",
+      "evidence_type": "supports",
+      "changed": true,
+      "note": "P2's corroborating null result is linked; corroboration factor should rise."
+    },
+    {
+      "step": "new_contradictory_evidence",
+      "claim_id": 1,
+      "score": 0.42457874657970457,
+      "factors": {
+        "contradiction": 0.16492693110647183,
+        "corroboration": 0.16032066400499462,
+        "methodology": 0.3,
+        "provenance": 1.0,
+        "semantic": 0.87,
+        "source": 0.5,
+        "temporal": 1.0
+      },
+      "evidence_added": "hypothetical illustrative pilot claim (not a corpus paper)",
+      "evidence_type": "contradicts",
+      "changed": true,
+      "note": "A low-quality contradicting claim is linked; contradiction_pressure factor should rise, but by less than a high-quality contradiction would, once weighted by the contradicting claim's own (low) reliability -- this is exactly what AERF's evidence-mass weighting is meant to test; the pilot claim has no methodology signals in its text, so its own AERF score, and hence its contribution to contra_mass, should be modest."
+    },
+    {
+      "step": "higher_quality_evidence",
+      "claim_id": 1,
+      "score": 0.4681117066761769,
+      "factors": {
+        "contradiction": 0.10270554758783661,
+        "corroboration": 0.2932640809687212,
+        "methodology": 0.3,
+        "provenance": 1.0,
+        "semantic": 0.9,
+        "source": 0.5,
+        "temporal": 1.0
+      },
+      "evidence_added": "P3 (CORONAVIT) large well-powered RCT, n=6200",
+      "evidence_type": "supports",
+      "changed": true,
+      "note": "A large, methodologically strong, independently-corroborating RCT is linked; corroboration factor should rise further and by a larger increment per unit of evidence than the earlier P2 addition, since P3 has explicit RCT/sample-size/statistical language driving its own methodology factor higher."
+    }
+  ],
+  "full_history": [
+    {
+      "history_id": 1,
+      "claim_id": 1,
+      "old_score": 0.37,
+      "new_score": 0.46122895277207393,
+      "triggered_by_paper_id": 2,
+      "triggered_by_claim_id": 2,
+      "factor_deltas": "{\"contradiction\": 0.0, \"corroboration\": 0.1786447638603696, \"methodology\": 0.0, \"provenance\": 0.0, \"semantic\": 0.37, \"source\": 0.0, \"temporal\": 0.0}",
+      "reason": "Reliability increased by 0.0912; corroboration=0.1786; contradiction_pressure=0.0000; semantic=0.8700; temporal=1.0000.",
+      "changed_at": "2026-09-03 05:26:51"
+    },
+    {
+      "history_id": 2,
+      "claim_id": 1,
+      "old_score": 0.46122895277207393,
+      "new_score": 0.42457874657970457,
+      "triggered_by_paper_id": 4,
+      "triggered_by_claim_id": 3,
+      "factor_deltas": "{\"contradiction\": 0.16492693110647183, \"corroboration\": -0.018324099855374976, \"methodology\": 0.0, \"provenance\": 0.0, \"semantic\": 0.0, \"source\": 0.0, \"temporal\": 0.0}",
+      "reason": "Reliability decreased by 0.0367; corroboration=0.1603; contradiction_pressure=0.1649; semantic=0.8700; temporal=1.0000.",
+      "changed_at": "2026-09-03 05:26:51"
+    },
+    {
+      "history_id": 4,
+      "claim_id": 1,
+      "old_score": 0.42457874657970457,
+      "new_score": 0.4681117066761769,
+      "triggered_by_paper_id": 3,
+      "triggered_by_claim_id": 4,
+      "factor_deltas": "{\"contradiction\": -0.06222138351863522, \"corroboration\": 0.13294341696372658, \"methodology\": 0.0, \"provenance\": 0.0, \"semantic\": 0.030000000000000027, \"source\": 0.0, \"temporal\": 0.0}",
+      "reason": "Reliability increased by 0.0435; corroboration=0.2933; contradiction_pressure=0.1027; semantic=0.9000; temporal=1.0000.",
+      "changed_at": "2026-09-03 05:26:51"
+    }
+  ],
+  "limitation_note": "Every AERFScorer.score() and AdaptiveAERFUpdater.recompute() call above is the real, unmodified baseline implementation. The claim TEXT for P1/P2/P3 is real, verified corpus content. The support/contradicts LABELS on the claim_pairs (who corroborates/contradicts whom) were supplied by human annotation (ground_truth_claim_pairs.json) rather than by the real NLI model, because this sandbox cannot download NLI model weights (see main report). The 'higher_quality_evidence' and 'new_contradictory_evidence' steps additionally use one hypothetical illustrative claim each (not drawn from the 5-paper corpus) purely to exercise the sequential-evidence-arrival mechanism end to end; this is flagged per-transition above and must not be read as a finding about any real paper."
+}

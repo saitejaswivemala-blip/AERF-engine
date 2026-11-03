@@ -1,0 +1,110 @@
+{
+  "corpus_topic": "Vitamin D supplementation and risk/treatment of acute respiratory infection (ARI)",
+  "corpus_selection_date": "2026-09-01",
+  "selection_note": "REVIEW1.docx's 20-paper literature survey (methods papers on NLP claim verification: SciFact, ContraCrow, NLI, etc.) was inspected first per the task instructions and found unsuitable as EXPERIMENT CONTENT: those papers are about claim-verification methods, not primary scientific findings, so they contain no comparable claims to match across documents. They remain the correct source for prior-art risk assessment (see the technical audit), not for this corpus. This manifest supplements REVIEW1 with real, freely-accessible primary/secondary research literature on one coherent topic, selected to contain genuine supporting, contradicting, neutral, and differing-population/evidence-strength cases.",
+  "papers": [
+    {
+      "paper_id": "P1",
+      "title": "Vitamin D supplementation to prevent acute respiratory infections: systematic review and meta-analysis of stratified aggregate data",
+      "authors": "Jolliffe DA, Camargo CA Jr, Sluyter JD, et al. (Martineau AR, senior author)",
+      "year": 2024,
+      "venue": "medRxiv (preprint)",
+      "doi": "10.1101/2024.09.18.24313866",
+      "source_url": "https://www.medrxiv.org/content/10.1101/2024.09.18.24313866",
+      "pdf_fetch_url": "https://www.medrxiv.org/content/10.1101/2024.09.18.24313866.full.pdf",
+      "pdf_path": "experiments/datasets/pdfs/P1_jolliffe2024_ari_meta_analysis.pdf",
+      "access_type": "open access preprint, freely downloadable, full text retrieved directly in this session",
+      "license": "medRxiv preprint license (author/funder retains copyright; preprint displayed in perpetuity by medRxiv); not certified by peer review",
+      "topic": "Vitamin D and ARI prevention (updated meta-analysis of 46 RCTs, 64,086 participants)",
+      "reason_for_selection": "Largest, most recent aggregate-data meta-analysis on the topic; reports both a null overall effect and statistically significant protective subgroup effects (children aged 1.00-15.99y, daily dosing, 400-1000 IU/day, trials <=12 months), giving genuine within-paper heterogeneity useful for entity/relation-alignment stress-testing.",
+      "key_reported_findings": [
+        "Overall: vitamin D vs placebo did not significantly reduce ARI risk (OR 0.94, 95% CI 0.88-1.00, 40 studies, 61,589 participants).",
+        "Subgroup, ages 1.00-15.99 years: statistically significant protective effect (OR 0.74, 95% CI 0.60-0.92, 16 studies).",
+        "Subgroup, daily dosing: statistically significant protective effect (OR 0.84, 95% CI 0.73-0.97).",
+        "Subgroup, 400-1000 IU/day daily dose: statistically significant protective effect (OR 0.70, 95% CI 0.55-0.89)."
+      ]
+    },
+    {
+      "paper_id": "P2",
+      "title": "Vitamin D and acute respiratory infection: secondary analysis of a previous randomised controlled trial and updated meta-analyses",
+      "authors": "Bolland MJ, Avenell A, Grey A, Gamble G",
+      "year": 2022,
+      "venue": "medRxiv (preprint)",
+      "doi": "10.1101/2022.02.03.22270409",
+      "source_url": "https://www.medrxiv.org/content/10.1101/2022.02.03.22270409",
+      "pdf_fetch_url": "https://www.medrxiv.org/content/10.1101/2022.02.03.22270409.full.pdf",
+      "pdf_path": "experiments/datasets/pdfs/P2_bolland2022_secondary_analysis.pdf",
+      "access_type": "open access preprint, freely downloadable, full text retrieved directly in this session",
+      "license": "CC-BY-NC 4.0 International",
+      "topic": "Methodological critique/reanalysis of the Blue Sky (Mongolia schoolchildren) trial underlying earlier positive meta-analyses",
+      "reason_for_selection": "Explicit, real methodological contradiction of the subgroup finding used to support 'vitamin D protects children with low baseline status' claims in earlier meta-analyses (predecessors of P1's 2021 version); once properly adjusted for cluster-randomisation, the same underlying trial data show no significant effect. This is a genuine same-topic, opposing-conclusion pair grounded in a documented scientific dispute, not a constructed example.",
+      "key_reported_findings": [
+        "After adjusting for cluster-randomisation design, vitamin D supplementation showed no statistically significant effect on ARI risk in any treatment group of the Blue Sky trial, or pooled (OR 0.58, 95% CI 0.26-1.29).",
+        "Updated meta-analysis incorporating the corrected cluster-adjusted data: OR 0.94 (95% CI 0.88-1.01), no significant protective effect.",
+        "Explicitly disputes the earlier meta-analyses' reliance on Blue Sky trial data analysed as if individually randomised."
+      ]
+    },
+    {
+      "paper_id": "P3",
+      "title": "Vitamin D Supplements for Prevention of COVID-19 or other Acute Respiratory Infections: a Phase 3 Randomised Controlled Trial (CORONAVIT)",
+      "authors": "Jolliffe DA, Holt H, Greenig M, et al. (Martineau AR, senior author)",
+      "year": 2022,
+      "venue": "medRxiv (preprint)",
+      "doi": "10.1101/2022.03.22.22271707",
+      "source_url": "https://www.medrxiv.org/content/10.1101/2022.03.22.22271707",
+      "pdf_fetch_url": "https://www.medrxiv.org/content/10.1101/2022.03.22.22271707.full.pdf",
+      "pdf_path": "experiments/datasets/pdfs/P3_coronavit2022_rct.pdf",
+      "access_type": "open access preprint, freely downloadable, full text retrieved directly in this session",
+      "license": "CC-BY-NC-ND 4.0 International",
+      "topic": "Vitamin D 'test-and-treat' for ARI and COVID-19 prevention in UK adults (single large RCT, n=6200)",
+      "reason_for_selection": "A single large, well-powered RCT (not a meta-analysis) in a distinct population (general UK adults, high baseline sub-optimal vitamin D prevalence) and a distinct intervention design (test-and-treat, 800 vs 3200 IU/day) from P1/P2, reporting a clean null result. Provides a different evidence-strength/design profile (single RCT vs meta-analyses) for the same overall question.",
+      "key_reported_findings": [
+        "No statistically significant reduction in all-cause ARI: higher-dose vs no-offer OR 1.09 (95% CI 0.82-1.46); lower-dose vs no-offer OR 1.26 (95% CI 0.96-1.66).",
+        "No statistically significant reduction in COVID-19: higher-dose vs no-offer OR 1.13 (95% CI 0.78-1.63); lower-dose vs no-offer OR 1.39 (95% CI 0.98-1.97).",
+        "Vitamin D supplementation was safe and raised serum 25(OH)D but did not protect against ARI or COVID-19 in this population."
+      ]
+    },
+    {
+      "paper_id": "P4",
+      "title": "Efficacy of Vitamin D Supplements in Treatment of Acute Respiratory Infection: A Meta-analysis for Randomized Controlled Trials",
+      "authors": "(PMC record; full author list not independently verified in this session)",
+      "year": 2022,
+      "venue": "PMC (PubMed Central) / peer-reviewed journal",
+      "doi": "PMID 35334804",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8955452/",
+      "pdf_fetch_url": null,
+      "pdf_path": "experiments/datasets/pdfs/P4_pmc8955452_treatment_meta_analysis.pdf",
+      "access_type": "PARTIAL — open-access PMC record confirmed (PMCID PMC8955452, free full text per PMC policy); this session could only retrieve the indexed abstract/results text via web search, because direct retrieval of the PMC article page was blocked by an automated bot-check (reCAPTCHA interstitial) in this sandbox. Full text was NOT independently fetched in this session.",
+      "license": "Per PMC open-access subset (specific journal license not verified in this session)",
+      "topic": "Vitamin D and ARI TREATMENT (as opposed to prevention) - meta-analysis of 18 RCTs, 3648 participants",
+      "reason_for_selection": "Only treatment-focused (vs. prevention-focused) meta-analysis identified for this corpus, giving a distinct claim type ('vitamin D helps treat an existing ARI') to compare against the prevention claims in P1-P3, P5.",
+      "key_reported_findings": [
+        "Meta-analysis of 18 RCTs found a statistically significant beneficial effect of vitamin D in treatment of ARI (RR 1.07, 95% CI 1.01-1.13, I2=66.9%).",
+        "NOTE: this finding is taken from indexed abstract text only; the full paper (methods, risk-of-bias detail) was not independently reviewed in this session."
+      ]
+    },
+    {
+      "paper_id": "P5",
+      "title": "The role of vitamin D in the prevention and treatment of acute respiratory infections in pediatric populations: a systematic review and meta-analysis of randomized controlled trials",
+      "authors": "(PMC record; full author list not independently verified in this session)",
+      "year": 2025,
+      "venue": "PMC (PubMed Central) / peer-reviewed journal",
+      "doi": "PMCID PMC12699866",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12699866/",
+      "pdf_fetch_url": null,
+      "pdf_path": "experiments/datasets/pdfs/P5_pmc12699866_pediatric_review.pdf",
+      "access_type": "PARTIAL — same limitation as P4: open-access PMC record confirmed, but this session's automated fetch was blocked by a bot-check interstitial; only the indexed abstract text was retrieved via web search.",
+      "license": "Per PMC open-access subset (specific journal license not verified in this session)",
+      "topic": "Vitamin D and ARI in pediatric populations specifically (prevention AND treatment combined), 17 RCTs, 18,372 participants",
+      "reason_for_selection": "Directly comparable population (pediatric) to P1's statistically significant child subgroup finding, but reaches the opposite overall conclusion for children as a population - a genuine same-population, differing-conclusion pair (though P1's subgroup is prevention-only, daily-dosing-only, while P5 pools prevention and treatment trials, which is itself a relevant condition difference for entity/relation alignment testing).",
+      "key_reported_findings": [
+        "Vitamin D supplementation did NOT significantly reduce pediatric ARI incidence (RR 0.82, 95% CI 0.64-1.06), hospitalisation duration, recovery time, or all-cause mortality.",
+        "NOTE: taken from indexed abstract text only; full paper not independently reviewed in this session."
+      ]
+    }
+  ],
+  "papers_rejected_from_review1": {
+    "note": "All 20 papers in REVIEW1.docx's literature survey were reviewed. None were selected for the experimental corpus.",
+    "reason": "REVIEW1's papers (SciFact, SciFact-Open, SCITAB, Clinical Contradiction Detection, ContraCrow/PaperQA2, Sentence-BERT, etc.) are methods/systems papers ABOUT claim verification, contradiction detection, or NLI - they do not themselves contain comparable scientific findings-claims (e.g. 'X reduces Y') that could be extracted and cross-document-matched by AERF Engine. Using them as pipeline input would mean extracting claims like 'SciFact contains 1.4K claims' rather than substantive scientific findings, which would not exercise cross-document support/contradiction reasoning meaningfully. They remain correctly used elsewhere (technical audit, prior-art risk section) as prior art on the claim-verification METHODS themselves, which is a different role from experimental CONTENT."
+  }
+}

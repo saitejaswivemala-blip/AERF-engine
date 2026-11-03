@@ -1,0 +1,177 @@
+{
+  "db_path": "experiments\\runs\\experiment.db",
+  "manifest_to_db_paper": {
+    "P1": 1,
+    "P2": 2,
+    "P3": 3,
+    "P4": 4,
+    "P5": 5
+  },
+  "n_ground_truth_pairs": 8,
+  "n_resolved": 0,
+  "n_unresolved": 8,
+  "unresolved_pairs": [
+    {
+      "pair_id": "gt_01",
+      "paper_a": "P1",
+      "paper_b": "P2",
+      "human_label": "supports",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.326 against claim_id=5",
+        "best_candidate": 5
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.309 against claim_id=13",
+        "best_candidate": 13
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_02",
+      "paper_a": "P1",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.326 against claim_id=5",
+        "best_candidate": 5
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.488 against claim_id=26",
+        "best_candidate": 26
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_03",
+      "paper_a": "P2",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.309 against claim_id=13",
+        "best_candidate": 13
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.488 against claim_id=26",
+        "best_candidate": 26
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_04",
+      "paper_a": "P1",
+      "paper_b": "P5",
+      "human_label": "neutral",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.282 against claim_id=6",
+        "best_candidate": 6
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.171 against claim_id=42",
+        "best_candidate": 42
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_05",
+      "paper_a": "P4",
+      "paper_b": "P1",
+      "human_label": "neutral",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "resolved",
+        "method": "token_overlap",
+        "score": 0.526,
+        "claim_id": 38,
+        "matched_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%)."
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.326 against claim_id=5",
+        "best_candidate": 5
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_06",
+      "paper_a": "P4",
+      "paper_b": "P5",
+      "human_label": "neutral",
+      "same_paper": false,
+      "resolution_a": {
+        "status": "resolved",
+        "method": "token_overlap",
+        "score": 0.526,
+        "claim_id": 38,
+        "matched_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%)."
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.171 against claim_id=42",
+        "best_candidate": 42
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_07",
+      "paper_a": "P1",
+      "paper_b": "P1",
+      "human_label": "contradicts",
+      "same_paper": true,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.421 against claim_id=2",
+        "best_candidate": 2
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.388 against claim_id=4",
+        "best_candidate": 4
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    },
+    {
+      "pair_id": "gt_08",
+      "paper_a": "P1",
+      "paper_b": "P1",
+      "human_label": "neutral",
+      "same_paper": true,
+      "resolution_a": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.448 against claim_id=6",
+        "best_candidate": 6
+      },
+      "resolution_b": {
+        "status": "unresolved",
+        "reason": "no candidate reached the token-overlap threshold (0.5); best was 0.300 against claim_id=5",
+        "best_candidate": 5
+      },
+      "status": "unresolved",
+      "reason": "claim_a and/or claim_b could not be confidently resolved to a DB claim"
+    }
+  ],
+  "cross_document_evaluation": null,
+  "cross_document_predictions": [],
+  "same_paper_evaluation_DIAGNOSTIC_ONLY": null,
+  "same_paper_predictions_DIAGNOSTIC_ONLY": [],
+  "validity_note": "0/6 cross-document ground-truth pairs were actually resolved and evaluated. This is NOT a scientifically valid accuracy/F1 measurement of AERF Engine: some ground-truth pairs could not be matched to real extracted claims and were excluded rather than guessed (see 'unresolved_pairs' below for exactly which ones and why). Any accuracy/F1 figure above reflects only the subset that was resolvable, on an already-tiny (n<10) ground-truth set -- treat it as a diagnostic spot-check, not a benchmark result, regardless of its value.",
+  "nli_model_name": "valhalla/distilbart-mnli-12-3"
+}

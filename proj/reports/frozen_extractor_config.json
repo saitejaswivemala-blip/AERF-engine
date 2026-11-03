@@ -1,0 +1,43 @@
+{
+  "extractor_status": "FROZEN_FOR_INDEPENDENT_EVALUATION",
+  "freeze_date": "2026-10-21T15:45:00+05:30",
+  "model_configuration": {
+    "model_name": "valhalla/distilbart-mnli-12-3",
+    "threshold": 0.35,
+    "spacy_model": "en_core_sci_sm",
+    "labels": [
+      "reports a result, finding, or conclusion",
+      "describes background or prior work",
+      "describes the method, model, or experimental setup",
+      "is other or irrelevant text"
+    ],
+    "hypothesis_template": "This sentence {}.",
+    "max_classify_chars": 700
+  },
+  "rescue_rules_inventory": {
+    "strong_result_cues_count": 11,
+    "metric_number_pattern": "\\b(?:bleu|f1|f-score|accuracy|auc|precision|recall|perplexity|rouge|exact match|em|top-?[15]|error rate|score)\\b[^.]{0,30}\\d|\\b\\d+(?:\\.\\d+)?\\s?%",
+    "contribution_pattern": "\\bwe (?:propose|introduce|present|develop|design)\\b[^.]{0,40}\\b(?:new|novel|simple|efficient|first|general)\\b",
+    "method_lead_suppression": "^\\W*(?:we|the (?:model|network|system|encoder|decoder)|our (?:model|approach|system))\\s+(?:use|used|using|train|trained|employ|employed|apply|applied|follow|followed|implement|implemented|set|fine-?tune[d]?|adopt|adopted|consist|collect|collected|describe|split|initiali[sz]e[d]?|optimi[sz]e[d]?|evaluate[d]?|compute[d]?|sample[d]?|tokeni[sz]e[d]?)\\b",
+    "background_citation_suppression": "\\bet al\\b|\\[\\d+(?:[,\\u2013-]\\s*\\d+)*\\]|\\bprevious (?:work|studies|research)\\b|\\bprior work\\b|\\brecent(?:ly)? (?:studies|work|advances)\\b|\\bhas been shown\\b|\\bhave been shown\\b|\\bwidely (?:used|adopted|studied)\\b|\\btraditionally\\b|\\bhave dominated\\b"
+  },
+  "baselines_inventory": {
+    "majority_class_baseline": {
+      "strategy": "predict_constant_0",
+      "description": "Predicts negative non-claim (0) for all sentences"
+    },
+    "transparent_rule_baseline": {
+      "strategy": "keyword_and_suppression_regex",
+      "description": "Predicts finding if result terms occur without method-lead opening or citation markers"
+    },
+    "pure_zeroshot_ablation": {
+      "strategy": "distilbart_mnli_top_label",
+      "description": "Standard zero-shot NLI top label without heuristic cue rescue"
+    }
+  },
+  "source_code_integrity_hashes": {
+    "nlp/claim_extractor.py": "1b643899b6e62893510b7eca7d95a3ff4e69a4a1c714017c3e9d8738f390ffa3",
+    "evaluate_claim_extractor.py": "09192589c5ef1937e8ab43a23abc92bbc84f83762773e93ec7b332460ba25be2"
+  },
+  "freeze_policy": "This configuration is frozen. To ensure academic rigor and avoid overfitting to test data, no rules, keywords, regexes, thresholds, or prompts may be modified once independent testing begins."
+}

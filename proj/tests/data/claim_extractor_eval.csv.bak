@@ -1,0 +1,9 @@
+﻿sentence,label
+"Experiments show that the proposed model significantly improves performance over the baseline.",1
+"The intervention significantly reduced mortality compared with placebo.",1
+"The new method achieved higher accuracy than the existing approach.",1
+"The treatment group showed a statistically significant improvement.",1
+"We trained the model on the WMT 2014 English-German dataset.",0
+"Dropout was used during training to improve generalization.",0
+"Participants were randomly assigned to two groups.",0
+"All experiments were conducted using Python.",0

@@ -1,0 +1,128 @@
+{
+  "audit_metadata": {
+    "audit_name": "AERF Engine Development Benchmark Evaluation Audit",
+    "timestamp": "2026-11-01T18:10:00Z",
+    "status": "VERIFIED_AUTHORITATIVE",
+    "dataset_path": "tests/data/claim_extractor_eval.csv",
+    "dataset_sha256": "6d57c285fa650f4c47384ab84708a4caab753720ba1b936a48ee4aa974c44354",
+    "total_samples": 80,
+    "class_distribution": {
+      "claim_positive_class_1": 34,
+      "non_claim_negative_class_0": 46,
+      "positive_ratio": 0.425
+    },
+    "source_papers_count": 6,
+    "source_papers": [
+      {"paper_id": "Vaswani_2017", "domain": "Natural Language Processing", "title": "Attention Is All You Need"},
+      {"paper_id": "Devlin_2018", "domain": "Natural Language Processing", "title": "BERT: Pre-training of Deep Bidirectional Transformers"},
+      {"paper_id": "Bolland_2014_2022", "domain": "Clinical Medicine", "title": "Vitamin D Supplementation in Acute Respiratory Infections"},
+      {"paper_id": "Martineau_2017", "domain": "Clinical Medicine", "title": "Vitamin D for Prevention of Acute Respiratory Infections"},
+      {"paper_id": "Jolliffe_2021_2024", "domain": "Clinical Medicine", "title": "Vitamin D Status and Susceptibility to COVID-19 / ARI"},
+      {"paper_id": "Zhang_2023", "domain": "Clinical Medicine", "title": "Vitamin D in COPD Exacerbations"}
+    ],
+    "annotation_status": {
+      "type": "Single-Expert Human Curation",
+      "guidelines_document": "docs/CLAIM_ANNOTATION_GUIDELINES.md",
+      "inter_rater_kappa": null,
+      "independent_double_annotation": false,
+      "adjudication_status": "Complete for single annotator"
+    }
+  },
+  "models_evaluated": {
+    "majority_class_baseline": {
+      "description": "Trivial baseline always predicting non-finding (0)",
+      "n": 80,
+      "accuracy": 0.5750,
+      "accuracy_95_ci": [0.4660, 0.6770],
+      "tp": 0, "fp": 0, "fn": 34, "tn": 46,
+      "precision_claim": 0.0000,
+      "recall_claim": 0.0000,
+      "f1_claim": 0.0000,
+      "precision_non_claim": 0.5750,
+      "recall_non_claim": 1.0000,
+      "f1_non_claim": 0.7302,
+      "macro_precision": 0.2875,
+      "macro_recall": 0.5000,
+      "macro_f1": 0.3651,
+      "weighted_f1": 0.4198
+    },
+    "rule_based_keyword_baseline": {
+      "description": "Transparent empirical keyword matching with method suppression regex",
+      "n": 80,
+      "accuracy": 0.6625,
+      "accuracy_95_ci": [0.5540, 0.7560],
+      "tp": 8, "fp": 1, "fn": 26, "tn": 45,
+      "precision_claim": 0.8889,
+      "recall_claim": 0.2353,
+      "f1_claim": 0.3721,
+      "precision_non_claim": 0.6338,
+      "recall_non_claim": 0.9783,
+      "f1_non_claim": 0.7692,
+      "macro_precision": 0.7613,
+      "macro_recall": 0.6068,
+      "macro_f1": 0.5707,
+      "weighted_f1": 0.6004
+    },
+    "baseline_extractor_pre_improvement": {
+      "description": "Pre-improvement zero-shot extractor (threshold 0.55, uncalibrated discourse rules)",
+      "source_file": "nlp/claim_extractor.py.bak",
+      "sha256": "f1dddfaa35e8c76f250fb0bfa069d758f1a96b882ed80580d1d59bed55f968f7",
+      "n": 80,
+      "accuracy": 0.8375,
+      "accuracy_95_ci": [0.7420, 0.9030],
+      "tp": 33, "fp": 12, "fn": 1, "tn": 34,
+      "precision_claim": 0.7333,
+      "precision_claim_95_ci": [0.5900, 0.8400],
+      "recall_claim": 0.9706,
+      "recall_claim_95_ci": [0.8470, 0.9980],
+      "f1_claim": 0.8354,
+      "precision_non_claim": 0.9714,
+      "recall_non_claim": 0.7391,
+      "f1_non_claim": 0.8395,
+      "macro_precision": 0.8524,
+      "macro_recall": 0.8549,
+      "macro_f1": 0.8375,
+      "weighted_f1": 0.8378
+    },
+    "improved_aerf_2_extractor": {
+      "description": "Active frozen production extractor (threshold 0.35, epistemic discourse router + multi-domain result cue rescue)",
+      "source_file": "nlp/claim_extractor.py",
+      "sha256": "1b643899b6e62893510b7eca7d95a3ff4e69a4a1c714017c3e9d8738f390ffa3",
+      "n": 80,
+      "accuracy": 0.9125,
+      "accuracy_95_ci": [0.8302, 0.9570],
+      "tp": 34, "fp": 7, "fn": 0, "tn": 39,
+      "precision_claim": 0.8293,
+      "precision_claim_95_ci": [0.6874, 0.9147],
+      "recall_claim": 1.0000,
+      "recall_claim_95_ci": [0.8985, 1.0000],
+      "f1_claim": 0.9067,
+      "precision_non_claim": 1.0000,
+      "recall_non_claim": 0.8478,
+      "f1_non_claim": 0.9176,
+      "macro_precision": 0.9146,
+      "macro_recall": 0.9239,
+      "macro_f1": 0.9122,
+      "weighted_f1": 0.9130
+    }
+  },
+  "improvement_delta_aerf2_vs_baseline": {
+    "accuracy_gain": "+7.50%",
+    "claim_precision_gain": "+9.60%",
+    "claim_recall_gain": "+2.94%",
+    "claim_f1_gain": "+7.13%",
+    "macro_f1_gain": "+7.47%",
+    "false_positives_reduction": "-5 (reduced from 12 to 7)",
+    "false_negatives_eliminated": "-1 (reduced from 1 to 0)"
+  },
+  "reproducibility_trace": {
+    "execution_script": "scripts/run_final_experimental_comparison.py",
+    "verified_python_version": "Python 3.12.3 (64-bit)",
+    "verified_libraries": {
+      "transformers": "4.57.6",
+      "torch": "2.6.0+cpu",
+      "scikit-learn": "1.4.2",
+      "spacy": "3.7.5"
+    }
+  }
+}

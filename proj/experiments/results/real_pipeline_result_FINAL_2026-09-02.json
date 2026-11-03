@@ -1,0 +1,63 @@
+{
+  "database": "experiments\\runs\\experiment.db",
+  "papers": 5,
+  "phase2": [
+    {
+      "paper_id": 1,
+      "chunks": 19,
+      "entities": 156,
+      "claims": 9,
+      "relations": 1,
+      "embeddings": 9
+    },
+    {
+      "paper_id": 2,
+      "chunks": 22,
+      "entities": 169,
+      "claims": 13,
+      "relations": 6,
+      "embeddings": 13
+    },
+    {
+      "paper_id": 3,
+      "chunks": 12,
+      "entities": 114,
+      "claims": 8,
+      "relations": 0,
+      "embeddings": 8
+    },
+    {
+      "paper_id": 4,
+      "chunks": 11,
+      "entities": 82,
+      "claims": 8,
+      "relations": 0,
+      "embeddings": 8
+    },
+    {
+      "paper_id": 5,
+      "chunks": 10,
+      "entities": 80,
+      "claims": 5,
+      "relations": 0,
+      "embeddings": 5
+    }
+  ],
+  "phase3": {
+    "paper_id": null,
+    "claims_considered": 43,
+    "candidate_relationships_persisted": 37,
+    "validated_relationships": {
+      "supports": 4,
+      "contradicts": 3,
+      "neutral": 16,
+      "uncertain": 14
+    },
+    "adaptive_score_changes": 7,
+    "graph_edges_synced": 474,
+    "evolution_snapshots": 237,
+    "research_gaps": 30
+  },
+  "nli_source": "real",
+  "scientific_result_status": "REAL MODEL EXECUTION. Ground-truth benchmark metrics are reported separately."
+}

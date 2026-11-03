@@ -1,0 +1,151 @@
+{
+  "evaluation_type": "PROVISIONAL_INDEPENDENT_EVALUATION",
+  "reference_label_provenance": "DUAL_AI_CONSENSUS_UNVERIFIED_BY_HUMAN",
+  "academic_validity_note": "These metrics reflect provisional agreement between the frozen claim extractor and the dual AI preliminary consensus. They must NOT be cited as verified benchmark accuracy until independent human annotation is completed.",
+  "sample_size": 143,
+  "class_balance": {
+    "provisional_positive_claims": 109,
+    "provisional_negative_non_claims": 34
+  },
+  "confusion_matrix": {
+    "tp": 39,
+    "fp": 6,
+    "fn": 70,
+    "tn": 28,
+    "matrix_format": "[[TP, FN], [FP, TN]] with labels [1, 0]"
+  },
+  "overall_metrics": {
+    "accuracy": 0.4685,
+    "accuracy_95_ci": [
+      0.3886,
+      0.5501
+    ],
+    "precision_finding_pos": 0.8667,
+    "precision_95_ci": [
+      0.7382,
+      0.9374
+    ],
+    "recall_finding_pos": 0.3578,
+    "recall_95_ci": [
+      0.2741,
+      0.4512
+    ],
+    "f1_finding_pos": 0.5065,
+    "precision_non_finding_neg": 0.2857,
+    "recall_non_finding_neg": 0.8235,
+    "f1_non_finding_neg": 0.4242,
+    "macro_avg": {
+      "precision": 0.5762,
+      "recall": 0.5907,
+      "f1_score": 0.4654
+    },
+    "weighted_avg": {
+      "precision": 0.7285,
+      "recall": 0.4685,
+      "f1_score": 0.4869
+    }
+  },
+  "stratified_by_paper": {
+    "INDEP_01_MATSCI": {
+      "total_samples": 15,
+      "provisional_claims": 8,
+      "provisional_non_claims": 7,
+      "accuracy": 0.5333333333333333,
+      "f1_score": 0.46153846153846156
+    },
+    "INDEP_02_ASTRO": {
+      "total_samples": 16,
+      "provisional_claims": 13,
+      "provisional_non_claims": 3,
+      "accuracy": 0.5625,
+      "f1_score": 0.6956521739130435
+    },
+    "INDEP_03_ENERGY": {
+      "total_samples": 16,
+      "provisional_claims": 14,
+      "provisional_non_claims": 2,
+      "accuracy": 0.4375,
+      "f1_score": 0.5263157894736842
+    },
+    "INDEP_04_GEOL": {
+      "total_samples": 16,
+      "provisional_claims": 12,
+      "provisional_non_claims": 4,
+      "accuracy": 0.4375,
+      "f1_score": 0.4
+    },
+    "INDEP_05_CLIM": {
+      "total_samples": 16,
+      "provisional_claims": 14,
+      "provisional_non_claims": 2,
+      "accuracy": 0.5625,
+      "f1_score": 0.6666666666666666
+    },
+    "INDEP_06_ECOL": {
+      "total_samples": 16,
+      "provisional_claims": 11,
+      "provisional_non_claims": 5,
+      "accuracy": 0.5,
+      "f1_score": 0.5
+    },
+    "INDEP_07_QUANTUM": {
+      "total_samples": 16,
+      "provisional_claims": 12,
+      "provisional_non_claims": 4,
+      "accuracy": 0.4375,
+      "f1_score": 0.47058823529411764
+    },
+    "INDEP_08_PLANTBIO": {
+      "total_samples": 16,
+      "provisional_claims": 14,
+      "provisional_non_claims": 2,
+      "accuracy": 0.3125,
+      "f1_score": 0.35294117647058826
+    },
+    "INDEP_09_ENVGEO": {
+      "total_samples": 16,
+      "provisional_claims": 11,
+      "provisional_non_claims": 5,
+      "accuracy": 0.4375,
+      "f1_score": 0.3076923076923077
+    }
+  },
+  "stratified_by_section": {
+    "abstract": {
+      "total_samples": 26,
+      "provisional_claims": 20,
+      "provisional_non_claims": 6,
+      "accuracy": 0.46153846153846156,
+      "f1_score": 0.5
+    },
+    "introduction": {
+      "total_samples": 27,
+      "provisional_claims": 19,
+      "provisional_non_claims": 8,
+      "accuracy": 0.4444444444444444,
+      "f1_score": 0.4
+    },
+    "methods": {
+      "total_samples": 27,
+      "provisional_claims": 18,
+      "provisional_non_claims": 9,
+      "accuracy": 0.4444444444444444,
+      "f1_score": 0.4
+    },
+    "results": {
+      "total_samples": 36,
+      "provisional_claims": 28,
+      "provisional_non_claims": 8,
+      "accuracy": 0.4444444444444444,
+      "f1_score": 0.5
+    },
+    "discussion": {
+      "total_samples": 27,
+      "provisional_claims": 24,
+      "provisional_non_claims": 3,
+      "accuracy": 0.5555555555555556,
+      "f1_score": 0.6666666666666666
+    }
+  },
+  "timestamp": "2026-10-21T12:23:30Z"
+}

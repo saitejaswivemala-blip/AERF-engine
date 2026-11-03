@@ -1,0 +1,27 @@
+[
+  {
+    "paper_id": "P1",
+    "db_paper_id": 1,
+    "source_filename": "P1_jolliffe2024_ari_meta_analysis.pdf"
+  },
+  {
+    "paper_id": "P2",
+    "db_paper_id": 2,
+    "source_filename": "P2_bolland2022_secondary_analysis.pdf"
+  },
+  {
+    "paper_id": "P3",
+    "db_paper_id": 3,
+    "source_filename": "P3_coronavit2022_rct.pdf"
+  },
+  {
+    "paper_id": "P4",
+    "db_paper_id": 4,
+    "source_filename": "P4_pmc8955452_treatment_meta_analysis.pdf"
+  },
+  {
+    "paper_id": "P5",
+    "db_paper_id": 5,
+    "source_filename": "P5_pmc12699866_pediatric_review.pdf"
+  }
+]

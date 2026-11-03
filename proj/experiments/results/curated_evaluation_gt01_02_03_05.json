@@ -1,0 +1,150 @@
+{
+  "db_path": "experiments\\runs\\experiment.db",
+  "n": 4,
+  "diagnostic_only": true,
+  "excluded_pairs": {
+    "gt_04": "Excluded per your read-only inspection: P5 has no extracted claim corresponding to this comparison.",
+    "gt_06": "Excluded for the same reason as gt_04 (shares the P5 side of the pair)."
+  },
+  "same_paper_diagnostics_only": {
+    "note": "gt_07 and gt_08 remain out of scope for this curated mapping. They stay handled exactly as before: resolvable-but-same-paper pairs, evaluated separately from cross-document metrics wherever they appear (see scripts/evaluate_real_results.py), because Phase3Pipeline.run()'s candidate generator explicitly skips same-paper pairs. This file does not process gt_07/gt_08 at all.",
+    "pair_ids": [
+      "gt_07",
+      "gt_08"
+    ]
+  },
+  "predictions": [
+    {
+      "pair_id": "gt_01",
+      "paper_a": "P1",
+      "paper_b": "P2",
+      "claim_a_id": 4,
+      "claim_b_id": 13,
+      "human_label": "supports",
+      "system_prediction": "uncertain",
+      "cosine_similarity": 0.8512352127347642,
+      "entity_overlap_score": 0.16666666666666666,
+      "nli_label": null,
+      "nli_confidence": null,
+      "correct": false,
+      "mapping_rationale": "User-supplied, verified against the real database: P1 claim_id=4, P2 claim_id=13. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_02",
+      "paper_a": "P1",
+      "paper_b": "P3",
+      "claim_a_id": 4,
+      "claim_b_id": 26,
+      "human_label": "supports",
+      "system_prediction": "uncertain",
+      "cosine_similarity": 0.7041218138133571,
+      "entity_overlap_score": 0.16666666666666666,
+      "nli_label": null,
+      "nli_confidence": null,
+      "correct": false,
+      "mapping_rationale": "User-supplied, verified against the real database: P1 claim_id=4, P3 claim_id=26. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_03",
+      "paper_a": "P2",
+      "paper_b": "P3",
+      "claim_a_id": 13,
+      "claim_b_id": 26,
+      "human_label": "supports",
+      "system_prediction": "uncertain",
+      "cosine_similarity": 0.6805367020327064,
+      "entity_overlap_score": 0.14285714285714285,
+      "nli_label": null,
+      "nli_confidence": null,
+      "correct": false,
+      "mapping_rationale": "User-supplied, verified against the real database: P2 claim_id=13, P3 claim_id=26. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_05",
+      "paper_a": "P4",
+      "paper_b": "P1",
+      "claim_a_id": 38,
+      "claim_b_id": 4,
+      "human_label": "neutral",
+      "system_prediction": "uncertain",
+      "cosine_similarity": 0.8272673227296735,
+      "entity_overlap_score": 0.05555555555555555,
+      "nli_label": null,
+      "nli_confidence": null,
+      "correct": false,
+      "mapping_rationale": "User-supplied, verified against the real database: P4 claim_id=38, P1 claim_id=4. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    }
+  ],
+  "evaluation": {
+    "n": 4,
+    "confusion_matrix": {
+      "supports": {
+        "supports": 0,
+        "contradicts": 0,
+        "neutral": 0,
+        "uncertain": 3
+      },
+      "contradicts": {
+        "supports": 0,
+        "contradicts": 0,
+        "neutral": 0,
+        "uncertain": 0
+      },
+      "neutral": {
+        "supports": 0,
+        "contradicts": 0,
+        "neutral": 0,
+        "uncertain": 1
+      },
+      "uncertain": {
+        "supports": 0,
+        "contradicts": 0,
+        "neutral": 0,
+        "uncertain": 0
+      }
+    },
+    "per_class": {
+      "supports": {
+        "label": "supports",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3
+      },
+      "contradicts": {
+        "label": "contradicts",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "neutral": {
+        "label": "neutral",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 1
+      },
+      "uncertain": {
+        "label": "uncertain",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "macro_precision": 0.0,
+    "macro_recall": 0.0,
+    "macro_f1": 0.0,
+    "accuracy": 0.0,
+    "false_support_rate": 0.0,
+    "false_contradiction_rate": 0.0,
+    "warnings": [
+      "n=4 is below the minimum (10) for statistically meaningful precision/recall/F1. Treat these numbers as a smoke test of the metric computation, not as an evaluation of AERF Engine's real-world accuracy.",
+      "No ground-truth instances of label 'contradicts' in this dataset; its precision/recall/F1 are reported as 0.0 by convention, not measured.",
+      "No ground-truth instances of label 'uncertain' in this dataset; its precision/recall/F1 are reported as 0.0 by convention, not measured."
+    ]
+  },
+  "validity_note": "n=4. This is a curated, non-random subset chosen because these were the pairs with confirmed real-claim extraction on both sides (see experiments/reports/curated_mapping_rationale.md). It is NOT a scientifically valid benchmark of AERF Engine's accuracy: the sample is far below any statistically meaningful size, was not randomly selected, and a single pair's outcome moves the headline accuracy by 25 percentage points. Treat this strictly as a diagnostic spot-check of real NLI + real matching on 4 specific, manually-verified claim pairs -- report the per-pair predictions above alongside any aggregate number, never the aggregate number alone.",
+  "nli_model_name": "valhalla/distilbart-mnli-12-3"
+}

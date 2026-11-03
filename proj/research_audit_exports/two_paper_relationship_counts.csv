@@ -1,0 +1,6 @@
+Validated_Stance_Label,Pair_Count,Percentage_of_Total_Pairs,Included_in_Agreement_Rate_Denominator
+neutral,669,82.09%,No (Excluded from stance concordance)
+contradicts,60,7.36%,Yes (Stance-bearing denominator)
+supports,54,6.63%,Yes (Numerator & stance-bearing denominator)
+uncertain,32,3.93%,No (Excluded due to low confidence or gate failure)
+TOTAL,815,100.00%,Agreement Denominator = 114 | Agreement Rate = 47.4%

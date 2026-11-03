@@ -1,0 +1,7 @@
+Experiment,Actual_Label,Pred_CLAIM_1,Pred_NON_CLAIM_0,Total
+Dev_Baseline,Actual_CLAIM_1,33,1,34
+Dev_Baseline,Actual_NON_CLAIM_0,12,34,46
+Dev_Improved_AERF2,Actual_CLAIM_1,34,0,34
+Dev_Improved_AERF2,Actual_NON_CLAIM_0,7,39,46
+Indep_Provisional_Improved,Actual_CLAIM_1,93,16,109
+Indep_Provisional_Improved,Actual_NON_CLAIM_0,10,24,34

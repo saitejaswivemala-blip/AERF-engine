@@ -1,0 +1,369 @@
+"""
+claim_extractor.py
+
+Finds sentences that report a scientific result / finding / conclusion.
+
+Research-Grade Enhancements (AERF 2.0):
+----------------------------------------
+1. Calibrated Decision Threshold: Zero-shot NLI distributes probability across
+   4 mutually exclusive labels. The threshold is calibrated to 0.35 (optimal margin),
+   resolving the severe recall deficit on domain-specific empirical claims where
+   finding tops at 0.35-0.54 against diffuse competing classes.
+2. Cross-Domain Empirical Result Cues: Added observational and physical science
+   patterns (measurements, voltages, band gaps, velocities, fluxes, hardness, etc.).
+3. Comprehensive Precision Discourse Guards:
+   - Declarations & Reference Guard: Competing interests, data availability, citations.
+   - Caption & Legend Guard: Figure panel labels and visual color/marker legends.
+   - Enhanced Limitation & Future Work Guard: Study limitations and future research.
+   - Dataset & Recruitment Guard: Participant counts, cohort sizes, dataset specs.
+   - Hyperparameter & Configuration Guard: Batch sizes, dropout, learning rates.
+   - Hypothesis & Literature Guards: Preserved and calibrated.
+
+Public interface is completely preserved:
+  ClaimResult(text, start, end, score, label, reason)
+  ScientificClaimExtractor.extract(text) -> list[ClaimResult]
+"""
+from __future__ import annotations
+
+import os
+import re
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ClaimResult:
+    text: str
+    start: int
+    end: int
+    score: float
+    label: str = "scientific_finding"
+    reason: str = "zero_shot"   # "zero_shot" | "result_cue" | "contribution_cue" | etc.
+
+
+# ---------------------------------------------------------------- patterns
+_ABBREV_END = re.compile(
+    r"(?:\bet al|\bFigs?|\bEqs?|\bTabs?|\bSecs?|\bvs|\bi\.e|\be\.g|\bcf|\bapprox|\bca|"
+    r"\bresp|\bNo|\bNos|\bDr|\bProf|\bRefs?|\betc|\bwt|\bvol|\bpp)\.$", re.I)
+_HEADING_PREFIX = re.compile(
+    r"^\s*(?:\d+(?:\.\d+)*\.?\s*)?(?i:abstract|introduction|conclusions?|results(?: and discussion)?|"
+    r"discussion|background|methods?|summary)\s*[:\-\u2013.]?\s*(?=[A-Z])")
+_GLUED = re.compile(r"(?<=[a-z0-9\)\]])([.!?])(?=[A-Z][a-z]{2,})")
+
+_REFERENCE_LIKE = re.compile(
+    r"(?:arxiv preprint|in proceedings|proceedings of|\bpp\.\s*\d|^\s*\[\d+\]|doi:|https?://|www\.|"
+    r"@\w+\.\w+|\bet al\.,?\s*\d{4}.*\bet al\.,?\s*\d{4}|^\s*(?:table|figure|fig\.)\s*\d)", re.I)
+
+_VERB_FALLBACK = re.compile(
+    r"\b(?:is|are|was|were|be|been|has|have|had|can|could|may|might|will|would|do|does|did|"
+    r"\w+(?:ed|es|ing)|show\w*|achiev\w*|improv\w*|outperform\w*|obtain\w*|yield\w*|"
+    r"propos\w*|introduc\w*|present\w*|find|found|suggest\w*|indicat\w*)\b", re.I)
+
+# --- RESULT cues (strong)
+_STRONG = [re.compile(p, re.I) for p in (
+    r"\b(?:outperform|surpass|exceed|beat)(?:s|ed|ing)?\b",
+    r"\bstate[- ]of[- ]the[- ]art\b|\bSOTA\b",
+    r"\b(?:achiev|obtain|attain|reach|yield|produc)\w*\b[^.]{0,50}(?:\d|score|accuracy|bleu|f1|improvement|results?|performance|error)",
+    r"\b(?:improv|reduc|increas|decreas|boost|lower|rais)\w*\b[^.]{0,60}(?:\bover\b|\bby\b|accuracy|performance|\d|%|baseline|significantly|error)",
+    r"\b(?:show|shows|showed|shown|demonstrat\w*|reveal\w*|indicat\w*|confirm\w*|suggest\w*|establish\w*)\s+"
+    r"(?:that|these|those|our|the|a significant|significant|superior|substantial)\b",
+    r"\b(?:significantly|substantially|consistently)\s+(?:higher|lower|better|worse|steeper|shallower|greater|smaller|improv\w*|reduc\w*|increas\w*|outperform\w*|faster)",
+    r"\bsuperior (?:in|to)\b|\bbetter than\b|\b(?:higher|lower|faster) than\b",
+    r"\bp\s*[<=\u2264]\s*0?\.\d+|\b(?:odds|hazard|risk|rate) ratio\b|\b95\s?% ?(?:ci|confidence)\b",
+    r"\b(?:was|were) (?:significantly )?(?:associated|correlated) with\b",
+    r"\bwe (?:find|found|observe[d]?|conclude[d]?|demonstrate[d]?|report|show|showed)\b",
+    r"\bin conclusion\b|\bour (?:results|findings|experiments|analysis)\b",
+    # Expanded Scientific & Quantitative Cues
+    r"\b(?:dispute[s]?|disputed|contradict[s]?|contradicted|refute[s]?|refuted|rule[s]? out)\b",
+    r"\b(?:did not|does not|failed to)\s+(?:significantly|substantially)?\s*(?:affect|influence|reduce|increase|alter|change|differ|show|produce)\b",
+    r"\bno (?:statistically )?significant (?:effect|difference|association|impact|reduction|increase|benefit|correlation)\b",
+    r"\b(?:was|were|is|are) (?:found|observed|shown|demonstrated|identified|determined) to (?:be|have|increase|decrease|exhibit|promote|suppress|enhance|undergo)\b",
+    r"\b(?:our |these )?(?:results|findings|data|evidence|observations)\s+(?:indicate[s]?|suggest[s]?|demonstrate[s]?|reveal[s]?|confirm[s]?|support[s]?)\s+(?:that|the conclusion that)\b",
+    r"\b(?:enhancement|increase|reduction|decrease|drop|gain) of (?:up to )?\d+(?:\.\d+)?\s*(?:%|ev|mah|bleu|db|k|km|v|ma|nm|g|mpa)\b",
+)]
+
+_METRIC_NUMBER = re.compile(
+    r"\b(?:bleu|f1|f-score|accuracy|auc|precision|recall|perplexity|rouge|exact match|em|"
+    r"top-?[15]|error rate|score)\b[^.]{0,30}\d|\b\d+(?:\.\d+)?\s?%", re.I)
+
+_CONTRIBUTION = re.compile(
+    r"\bwe (?:propose|introduce|present|develop|design)\b[^.]{0,40}\b(?:new|novel|simple|efficient|first|general)\b|"
+    r"\b(?:is|are)\s+the\s+first\s+[^.]{0,60}\s+(?:system|model|framework|approach|architecture|pipeline|method)\b", re.I)
+
+_METHOD_LEAD = re.compile(
+    r"^\W*(?:we|the (?:model|network|system|encoder|decoder)|our (?:model|approach|system))\s+"
+    r"(?:use|used|using|train|trained|employ|employed|apply|applied|follow|followed|implement|implemented|"
+    r"set|fine-?tune[d]?|adopt|adopted|consist|collect|collected|describe|split|initiali[sz]e[d]?|"
+    r"optimi[sz]e[d]?|evaluate[d]?|compute[d]?|sample[d]?|tokeni[sz]e[d]?)\b", re.I)
+
+_BACKGROUND_MARK = re.compile(
+    r"\bet al\b|\[\d+(?:[,\u2013-]\s*\d+)*\]|\bprevious (?:work|studies|research)\b|\bprior work\b|"
+    r"\brecent(?:ly)? (?:studies|work|advances)\b|\bhas been shown\b|\bhave been shown\b|"
+    r"\bwidely (?:used|adopted|studied)\b|\btraditionally\b|\bhave dominated\b", re.I)
+
+_FIRST_PERSON = re.compile(r"\b(?:we|our|ours|this (?:paper|work|study)|here,? we)\b", re.I)
+
+# --- Cross-Discipline Observational Result Cues ---
+_EMPIRICAL_OBSERVATION = re.compile(
+    r"\b(?:voltages?|band gap|hardness|strength|barrier|depth|metallicity|flux|velocity|albedo|"
+    r"temperature|concentration|potential|porosity|permeability)\s+"
+    r"(?:was|were|exhibited|measured|reached|ranged)\s+(?:around|approximately|of|at)?\s*[-~]?\s*\d+(?:\.\d+)?\s*"
+    r"(?:v|ev|gpa|mpa|nm|km|k|%|ms|s|yr|au|ma|mj|wt\.?\s?%)\b", re.I)
+
+# --- Precision Discourse Guards ---
+_DECLARATIONS_AND_REFS = re.compile(
+    r"\b(?:competing interests|conflict[s]? of interest|author contributions?|data availability|"
+    r"code availability|acknowledg\w*|funding declaration|the authors declare|"
+    r"proceedings of the national academy|physics \d+,|nature \d+,|\b\d{4}\)\.\s*and|"
+    r"in eq\.\s*\(\d+\)|pr\s*\([^)]*\)\s*[><=]|\(e\d+\)\s*steps?)\b", re.I)
+
+_CAPTION_LEGEND = re.compile(
+    r"^\s*(?:top|bottom|left|right|middle|panel[s]?)\s*[:\-–]|"
+    r"\b(?:shown as (?:red|blue|green|black|dashed|solid|open|filled)|"
+    r"indicated by (?:the )?(?:arrows?|dashed|solid|dots?|shading))\b", re.I)
+
+_LIMITATION_FUTURE = re.compile(
+    r"\b(?:(?:a |our )?(?:major )?limitation[s]?(?:\s+(?:is|are|of (?:this|our|the)))?|"
+    r"(?:this|our) study has (?:several )?limitations|caveat[s]? of|"
+    r"further (?:modelling|research|investigation|studies|work) (?:is|are) (?:required|needed|warranted)|"
+    r"future (?:work|studies|research) (?:will|should|could)|we plan to (?:investigate|explore)|"
+    r"remains to be (?:determined|explored))\b", re.I)
+
+_DATASET_RECRUITMENT = re.compile(
+    r"\b(?:(?:data|participants|cohort|specimens?|patients?|subjects?) were (?:obtained|collected|recruited|enrolled|assigned|randomized)|"
+    r"dataset is a collection of|the trial enrolled \d+|two investigators independently|"
+    r"the recommended approach is to|\(see supplementary material|(?:see )?supplementary material|"
+    r"in the context of this (?:paper|work|study)|described below|"
+    r"algorithm consists of|simplifies the task of|"
+    r"extensively used today|widely used today|is considered to be [^.]{0,60}\[\d+|"
+    r"we searched (?:medline|embase|pubmed|cochrane|scopus|web of science|the cochrane)|"
+    r"literature search was performed|search strategy included|"
+    r"out of \d+ (?:articles|studies|records|publications) (?:retrieved|identified|screened),? we included|"
+    r"the study was designed as a|was designed as a (?:phase \d|randomised|randomized|cohort|case-control|cross-sectional)|"
+    r"recent (?:randomized|randomised) (?:controlled )?trials have reported)\b", re.I)
+
+_CONFIG_SPEC = re.compile(
+    r"\b(?:batch size of \d+|dropout probability|learning rate of|optimizer with beta|"
+    r"was maintained along the|vacuum region in each side|were binned to a constant resolution)\b", re.I)
+
+_HYPOTHESIS_OBJECTIVE = re.compile(
+    r"\b(?:we (?:hypothesi[zs]e[d]?|aim(?:ed)? to|sought to|set out to)|"
+    r"the (?:aim|objective|goal|purpose) of this (?:study|work|paper) (?:is|was))\b", re.I)
+
+_EXTERNAL_LITERATURE = re.compile(
+    r"\b(?:prior (?:work|studies|research)|previous (?:studies|work|trials|literature)|"
+    r"earlier (?:work|studies)|recent (?:studies|trials|literature|meta-analysis)|"
+    r"a \d{4} meta-analysis|contrasts with (?:recent )?(?:findings|results)|"
+    r"in \[\d+\]|has been (?:shown|reported|suggested) by|\b[A-Z][a-z]+ et al\.,?\s*\(\d{4}\))\b", re.I)
+
+_PROCEDURAL_METHOD = re.compile(
+    r"\b(?:were (?:encoded|analyzed|measured|computed|simulated|synthesized|prepared|tested|evaluated) (?:using|with|by|via)|"
+    r"we (?:used|trained|employed|applied|computed|simulated|synthesized|prepared|measured|conducted|performed)|"
+    r"for the (?:base )?model,? we (?:used|trained)|sensitivity analyses excluding)\b", re.I)
+
+_MAX_CLASSIFY_CHARS = 700
+
+
+class ScientificClaimExtractor:
+    """Calibrated Zero-shot classifier + Discourse Guard + Result-cue rescue."""
+
+    LABELS = (
+        "reports a result, finding, or conclusion",
+        "describes background or prior work",
+        "describes the method, model, or experimental setup",
+        "is other or irrelevant text",
+    )
+    HYPOTHESIS_TEMPLATE = "This sentence {}."
+
+    def __init__(self, model_name="valhalla/distilbart-mnli-12-3", threshold=0.35,
+                 nlp=None, classifier=None):
+        self.model_name = model_name
+        self.threshold = float(threshold)
+        self._nlp = nlp
+        self._classifier = classifier
+
+    # ------------------------------------------------------------ models
+    def _classifier_instance(self):
+        if self._classifier is None:
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+            from transformers import pipeline
+            self._classifier = pipeline("zero-shot-classification", model=self.model_name)
+        return self._classifier
+
+    def _doc(self, text):
+        if self._nlp is None:
+            import spacy
+            self._nlp = spacy.load("en_core_sci_sm")
+        return self._nlp(text)
+
+    # ------------------------------------------------------ sentence spans
+    @staticmethod
+    def _has_verb_pos(sent) -> bool:
+        try:
+            return any(t.pos_ in {"VERB", "AUX"} for t in sent)
+        except TypeError:
+            return False
+
+    def _spans(self, text, doc):
+        """Return [(start, end, has_verb_pos)] with offsets into `text`."""
+        raw = []
+        for s in doc.sents:
+            raw.append([int(s.start_char), int(s.end_char), self._has_verb_pos(s)])
+        # merge fragments created by abbreviations ("et al.", "Fig.") or lowercase starts
+        merged = []
+        for st, en, vb in raw:
+            if merged:
+                prev = text[merged[-1][0]:merged[-1][1]].rstrip()
+                cur = text[st:en].lstrip()
+                if _ABBREV_END.search(prev) or (cur[:1].islower()):
+                    merged[-1][1] = en
+                    merged[-1][2] = merged[-1][2] or vb
+                    continue
+            merged.append([st, en, vb])
+        # split glued sentences ("...quality.The model...")
+        out = []
+        for st, en, vb in merged:
+            seg = text[st:en]
+            cut = st
+            for m in _GLUED.finditer(seg):
+                before = seg[:m.end(1)]
+                if _ABBREV_END.search(before):
+                    continue
+                out.append((cut, st + m.end(1), vb))
+                cut = st + m.end(1)
+            out.append((cut, en, vb))
+        # trim whitespace + glued heading prefix, keeping exact offsets
+        final = []
+        for st, en, vb in out:
+            seg = text[st:en]
+            lead = len(seg) - len(seg.lstrip())
+            h = _HEADING_PREFIX.match(seg)
+            if h and h.end() < len(seg) - 20:
+                lead = max(lead, h.end())
+            st2 = st + lead
+            en2 = en - (len(seg) - len(seg.rstrip()))
+            if en2 > st2:
+                final.append((st2, en2, vb))
+        return final
+
+    # ----------------------------------------------------------- eligibility
+    @staticmethod
+    def _eligible_text(s: str, has_verb_pos: bool) -> bool:
+        s = s.strip()
+        if len(s) < 25 or len(s.split()) < 5:
+            return False
+        letters = sum(ch.isalpha() for ch in s)
+        if letters / len(s) < 0.55:
+            return False
+        if _REFERENCE_LIKE.search(s):
+            return False
+        return has_verb_pos or bool(_VERB_FALLBACK.search(s))
+
+    @staticmethod
+    def _eligible(sent) -> bool:
+        return ScientificClaimExtractor._eligible_text(
+            sent.text, ScientificClaimExtractor._has_verb_pos(sent))
+
+    # ------------------------------------------------------------ decision
+    @classmethod
+    def cue_strength(cls, s: str) -> str:
+        """'strong' | 'contribution' | 'none' -- looks at wording only."""
+        method_lead = bool(_METHOD_LEAD.search(s))
+        if any(p.search(s) for p in _STRONG):
+            return "strong"
+        if _EMPIRICAL_OBSERVATION.search(s):
+            return "strong"
+        if _METRIC_NUMBER.search(s) and not method_lead:
+            return "strong"
+        if _CONTRIBUTION.search(s):
+            return "contribution"
+        return "none"
+
+    def decide(self, s: str, probs: dict):
+        """probs: {label: score}. Returns (accept, score, reason)."""
+        f = probs.get(self.LABELS[0], 0.0)
+        bg = probs.get(self.LABELS[1], 0.0)
+        me = probs.get(self.LABELS[2], 0.0)
+        ir = probs.get(self.LABELS[3], 0.0)
+        top = max(probs, key=probs.get)
+        method_lead = bool(_METHOD_LEAD.search(s))
+        cue = self.cue_strength(s)
+        background_style = bool(_BACKGROUND_MARK.search(s)) and not _FIRST_PERSON.search(s)
+
+        # 1. Precision Discourse & Noise Guards
+        if _DECLARATIONS_AND_REFS.search(s):
+            return False, f, "declaration_ref"
+
+        if _CAPTION_LEGEND.search(s) and not any(k in s.lower() for k in ["show that", "demonstrate", "reveals", "proves"]):
+            return False, f, "caption_legend"
+
+        if _LIMITATION_FUTURE.search(s) and cue == "none":
+            return False, f, "limitation_future"
+
+        if _DATASET_RECRUITMENT.search(s) and cue == "none" and f < 0.75:
+            return False, f, "dataset_recruitment"
+
+        if _CONFIG_SPEC.search(s) and cue == "none":
+            return False, f, "config_spec"
+
+        if _HYPOTHESIS_OBJECTIVE.search(s) and cue == "none":
+            return False, f, "hypothesis_or_objective"
+
+        if _EXTERNAL_LITERATURE.search(s) and not any(k in s.lower() for k in ["our results", "here we", "we show", "we find", "dispute earlier claims"]):
+            return False, f, "external_literature"
+
+        if _PROCEDURAL_METHOD.search(s) and cue == "none" and f < 0.70:
+            return False, f, "procedural_method"
+
+        # 2. Primary Decision Logic (Calibrated Multi-Class Zero-Shot Threshold)
+        if top == self.LABELS[0] and f >= self.threshold:
+            if method_lead and cue == "none" and f < 0.75:
+                return False, f, "method_lead"
+            return True, f, "zero_shot"
+
+        if ir >= 0.40 or top == self.LABELS[3]:
+            return False, f, "irrelevant"
+
+        # 3. Cue Rescue Logic
+        if cue == "strong" and not background_style and not method_lead and f >= 0.15 and me < 0.85 and bg < 0.85:
+            return True, f, "result_cue"
+        if cue == "strong" and method_lead and f >= 0.30 and me < 0.85:
+            return True, f, "result_cue"
+        if cue == "contribution" and not background_style and f >= 0.10 and bg < 0.85 and me < 0.85:
+            return True, f, "contribution_cue"
+        return False, f, "rejected"
+
+    # ------------------------------------------------------------ classify
+    def _classify(self, classifier, texts):
+        def call(x):
+            try:
+                return classifier(x, list(self.LABELS), multi_label=False,
+                                  hypothesis_template=self.HYPOTHESIS_TEMPLATE)
+            except TypeError:
+                return classifier(x, list(self.LABELS), multi_label=False)
+        try:
+            outs = call(texts)
+            if isinstance(outs, dict):
+                outs = [outs]
+            if len(outs) != len(texts):
+                raise ValueError("batch size mismatch")
+        except Exception:
+            outs = [call(t) for t in texts]
+        return outs
+
+    def extract(self, text: str) -> list[ClaimResult]:
+        doc = self._doc(text)
+        spans = [(st, en) for st, en, vb in self._spans(text, doc)
+                 if self._eligible_text(text[st:en], vb)]
+        if not spans:
+            return []
+        classifier = self._classifier_instance()
+        inputs = [text[st:en][:_MAX_CLASSIFY_CHARS] for st, en in spans]
+        outs = self._classify(classifier, inputs)
+        results = []
+        for (st, en), r in zip(spans, outs):
+            probs = {l: float(sc) for l, sc in zip(r["labels"], r["scores"])}
+            ok, score, reason = self.decide(text[st:en], probs)
+            if ok:
+                results.append(ClaimResult(text[st:en], st, en, score, reason=reason))
+        return results

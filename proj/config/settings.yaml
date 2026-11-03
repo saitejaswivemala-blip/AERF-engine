@@ -1,0 +1,56 @@
+# AERF Engine — Global Settings
+# Phase 1 only uses the sections below marked [PHASE 1].
+# Sections for later phases are listed here as placeholders so the config
+# shape is stable across phases, but nothing in Phase 1 code reads them yet.
+
+# [PHASE 1] Filesystem paths (relative to project root unless absolute)
+paths:
+  database_file: experiments/runs/experiment.db
+  raw_pdf_dir: "data/raw_pdfs"
+  log_dir: "logs"
+
+# [PHASE 1] Text cleaning / chunking behavior
+preprocessing:
+  # Minimum characters for a chunk to be kept (drops empty/near-empty fragments,
+  # e.g. stray page numbers or running headers).
+  min_chunk_length: 15
+  # Maximum characters for a single chunk before it is force-split.
+  # Guards against a "sentence" splitter failing to find a boundary
+  # (e.g. inside a table or reference list) and producing one giant chunk.
+  max_chunk_length: 1000
+  # De-hyphenate words split across a line break, e.g. "cardio-\nvascular" -> "cardiovascular"
+  dehyphenate_line_breaks: true
+
+# [PHASE 1] Logging
+logging:
+  level: "INFO"
+  log_to_file: true
+  log_filename: "aerf_engine.log"
+
+# [PLACEHOLDER — not used until Phase 2] model names for NLP components
+# models:
+#   ner_model: "en_core_sci_md"
+#   embedding_model: "all-MiniLM-L6-v2"
+#   nli_model: "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
+
+# [PLACEHOLDER — not used until Phase 3/4] matching + AERF thresholds
+# thresholds:
+#   candidate_similarity: 0.55
+#   nli_confidence: 0.6
+
+# [PHASE 2] Scientific NLP
+models:
+  ner_model: "en_core_sci_sm"
+  claim_model: "valhalla/distilbart-mnli-12-3"
+  embedding_model: "all-MiniLM-L6-v2"
+claim_extraction:
+  threshold: 0.55
+
+# [PHASE 3] Cross-document reasoning + AERF
+phase3:
+  nli_model: "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
+  candidate_similarity: 0.55
+  entity_overlap: 0.15
+  nli_confidence: 0.60
+  aerf_weights_file: "config/aerf_weights.yaml"
+  adaptive_epsilon: 0.001

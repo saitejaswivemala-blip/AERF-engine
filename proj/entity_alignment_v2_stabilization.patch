@@ -1,0 +1,980 @@
+diff --git a/matching/claim_matcher.py b/matching/claim_matcher.py
+index bb55199..05dec64 100644
+--- a/matching/claim_matcher.py
++++ b/matching/claim_matcher.py
+@@ -2,6 +2,8 @@ from __future__ import annotations
+ from dataclasses import dataclass
+ import numpy as np
+ 
++from matching.entity_alignment import align_entities as _align_entities_v2
++
+ @dataclass(frozen=True)
+ class MatchDecision:
+     claim_a_id: int
+@@ -16,12 +18,34 @@ class MatchDecision:
+     nli_contradiction: float
+     nli_neutral: float
+     method: str
++    entity_alignment_detail: object = None  # AlignmentResult when entity_alignment_version="v2", else None
+ 
+ class ClaimMatcher:
+-    """Similarity is only a candidate gate; NLI + entity alignment decide the relationship."""
+-    def __init__(self, nli, similarity_threshold=.55, entity_threshold=.2, nli_threshold=.6):
++    """
++    Similarity is only a candidate gate; NLI + entity alignment decide the
++    relationship.
++
++    entity_alignment_version:
++      "v1" (default) -- ORIGINAL, UNCHANGED behavior: exact-string overlap
++        after strip().lower() only. This is what every existing test,
++        experiment result, and documented number (README.md, experiment
++        reports) was produced with. Do not change this default.
++      "v2" (opt-in) -- routes entity comparison through
++        matching/entity_alignment.py: Unicode/case/punctuation
++        normalization, conservative plural handling, and a small explicit
++        alias table (e.g. OR <-> odds ratio), while explicitly refusing to
++        merge related-but-distinct measures (e.g. rate ratio vs relative
++        risk) or coincidental character substrings. See that module's
++        docstring and tests/unit/test_entity_alignment.py for the real
++        diagnostic evidence behind this option.
++    """
++    def __init__(self, nli, similarity_threshold=.55, entity_threshold=.2, nli_threshold=.6,
++                 entity_alignment_version="v1"):
+         self.nli=nli; self.similarity_threshold=float(similarity_threshold)
+         self.entity_threshold=float(entity_threshold); self.nli_threshold=float(nli_threshold)
++        if entity_alignment_version not in ("v1", "v2"):
++            raise ValueError("entity_alignment_version must be 'v1' or 'v2'")
++        self.entity_alignment_version = entity_alignment_version
+     @staticmethod
+     def cosine(a,b):
+         a=np.asarray(a,dtype=float); b=np.asarray(b,dtype=float)
+@@ -37,8 +61,14 @@ class ClaimMatcher:
+     def match(self, claim_a, claim_b, entities_a, entities_b, relations_a, relations_b, emb_a, emb_b):
+         sim=self.cosine(emb_a,emb_b)
+         if sim < self.similarity_threshold: return None
+-        ea={e['text'].strip().lower() for e in entities_a}; eb={e['text'].strip().lower() for e in entities_b}
+-        u=ea|eb; overlap=len(ea&eb)/len(u) if u else 0.0
++        alignment_detail = None
++        if self.entity_alignment_version == "v2":
++            alignment_detail = _align_entities_v2(entities_a, entities_b, threshold=self.entity_threshold)
++            overlap = alignment_detail.overlap_score
++            u = bool(entities_a or entities_b)
++        else:
++            ea={e['text'].strip().lower() for e in entities_a}; eb={e['text'].strip().lower() for e in entities_b}
++            u=ea|eb; overlap=len(ea&eb)/len(u) if u else 0.0
+         if u and overlap < self.entity_threshold: return None
+         ra=self._relation_alignment(relations_a,relations_b)
+         n=self.nli.predict_bidirectional(claim_a['text'],claim_b['text'])
+@@ -46,4 +76,4 @@ class ClaimMatcher:
+         validated='uncertain'
+         if aligned and n.confidence>=self.nli_threshold:
+             validated={'entailment':'supports','contradiction':'contradicts','neutral':'neutral'}.get(n.label,'uncertain')
+-        return MatchDecision(claim_a['claim_id'],claim_b['claim_id'],sim,overlap,ra,n.label,n.confidence,validated,n.entailment,n.contradiction,n.neutral,'embedding→entity-alignment→bidirectional-NLI')
++        return MatchDecision(claim_a['claim_id'],claim_b['claim_id'],sim,overlap,ra,n.label,n.confidence,validated,n.entailment,n.contradiction,n.neutral,'embedding→entity-alignment→bidirectional-NLI',alignment_detail)
+diff --git a/matching/entity_alignment.py b/matching/entity_alignment.py
+new file mode 100644
+index 0000000..4359def
+--- /dev/null
++++ b/matching/entity_alignment.py
+@@ -0,0 +1,295 @@
++"""
++matching/entity_alignment.py
++
++Entity Alignment V2 — an explainable, deterministic upgrade to the entity
++comparison used by ClaimMatcher.match().
++
++WHY THIS EXISTS
++---------------
++The original (v1, still the default) entity overlap in
++matching/claim_matcher.py is:
++
++    ea = {e['text'].strip().lower() for e in entities_a}
++    eb = {e['text'].strip().lower() for e in entities_b}
++    overlap = len(ea & eb) / len(ea | eb)
++
++That is exact-string-after-lowercasing set overlap. A real diagnostic run
++against the 4 cross-paper reviewed benchmark pairs (see
++experiments/results/entity_alignment_v2_diagnostic.json, generated
++read-only against experiments/runs/experiment.db) found the following
++concrete, traceable causes for entity-gate rejection -- NOT a generic
++"the threshold is too strict":
++
++  gt_01 (claim 4 vs 13): overlap 0.167 (below 0.20). Root cause: claim 13's
++    NER extracted BOTH "ARI" and "ARIs" as separate entities (a plural
++    surface-form duplicate), and claim 4 uses "OR" where claim 13's paper
++    spells out "odds ratio" -- the same statistical quantity, different
++    surface form.
++  gt_02 (claim 4 vs 26): overlap 0.167. Root cause: no abbreviation/alias
++    overlap available (claim 26 never mentions OR/odds ratio); the shared
++    concepts are "vitamin D", "ARI", "risk" only. This pair is NOT
++    recoverable by safe normalization alone -- see NOT_RECOVERABLE below.
++  gt_03 (claim 13 vs 26): overlap 0.143. Same root cause as gt_02.
++  gt_05 (claim 38 vs 4): overlap 0.056. Root cause: claim 38 extracted both
++    "relative risk" and "RR" as separate entities (self-duplicate), and
++    otherwise shares almost no surface vocabulary with claim 4. NOT
++    recoverable by safe normalization alone.
++
++This module does NOT lower any threshold. It computes a *better* overlap
++score using normalization and a small, explicit, human-reviewed alias
++table, and reports -- for every entity pair -- which matching strategy
++produced the decision, so a reviewer can audit every merge. It is wired
++into ClaimMatcher as an OPT-IN alternative (entity_alignment_version="v2"),
++not a replacement of the default behavior. See ClaimMatcher docstring.
++"""
++from __future__ import annotations
++
++import unicodedata
++from dataclasses import dataclass, field
++from enum import Enum
++
++
++class MatchCategory(str, Enum):
++    EXACT = "exact"                    # identical after normalization
++    ALIAS = "alias"                    # known abbreviation/full-form equivalence
++    PARTIAL = "partial"                # one is a substring/superset of the other
++    RELATED_NON_EQUIVALENT = "related_non_equivalent"  # related but not the same measure
++    CONTRADICTORY = "contradictory"    # explicitly conflicting (not auto-detected here;
++                                        # reserved for future attribute-level checks)
++    UNKNOWN = "unknown"                # no relationship found
++
++
++@dataclass(frozen=True)
++class EntityMatchResult:
++    source_entity: str
++    target_entity: str
++    source_normalized: str
++    target_normalized: str
++    strategy: str            # "exact_string" | "alias_table" | "substring" | "none"
++    category: MatchCategory
++    score: float              # 0.0-1.0, used as this pair's contribution weight
++    supporting_attributes: list = field(default_factory=list)
++    conflicting_attributes: list = field(default_factory=list)
++    reason: str = ""
++
++
++@dataclass(frozen=True)
++class AlignmentResult:
++    overlap_score: float
++    threshold: float
++    passed: bool
++    matches: list  # list[EntityMatchResult], EXACT/ALIAS/PARTIAL only (i.e. contributing)
++    unmatched_source: list
++    unmatched_target: list
++    rejection_reason: str = ""
++
++
++# --------------------------------------------------------------------------
++# Normalization
++# --------------------------------------------------------------------------
++
++def normalize_entity_text(text: str) -> str:
++    """
++    Deterministic normalization: Unicode NFKC, casefold, strip, collapse
++    internal whitespace, strip common leading/trailing punctuation.
++    Does NOT do any semantic/fuzzy matching -- this is purely mechanical.
++    """
++    if text is None:
++        return ""
++    t = unicodedata.normalize("NFKC", text)
++    t = t.casefold().strip()
++    t = " ".join(t.split())
++    t = t.strip(".,;:()[]{}\"'")
++    return t
++
++
++_PLURAL_EXCEPTIONS = {
++    # words where naive trailing-"s" stripping would be wrong or unsafe;
++    # left un-stripped deliberately.
++    "os", "is", "as", "vs", "ras", "sars", "aids", "mers",
++}
++
++
++def normalize_plural(term: str) -> str:
++    """
++    Conservative singular/plural normalization. Only strips a trailing "s"
++    when the word is long enough (>4 chars) that doing so is unlikely to
++    collide two unrelated short tokens or acronyms, and the word is not in
++    the explicit exception list. This is intentionally NOT a full
++    lemmatizer -- it is a narrow, auditable rule, matching the "safe"
++    scope requested (do not merge entities on aggressive heuristics).
++    """
++    if len(term) > 4 and term.endswith("s") and not term.endswith("ss") and term not in _PLURAL_EXCEPTIONS:
++        return term[:-1]
++    return term
++
++
++# --------------------------------------------------------------------------
++# Alias table -- small, explicit, human-reviewed. Every entry here is a
++# genuine abbreviation <-> full-form equivalence, not a semantic-similarity
++# guess. Each entry is deliberately narrow: we do NOT alias "rate ratio" to
++# "relative risk"/"RR" even though they are related, because they are
++# distinct epidemiological measures -- that pair is classified as
++# RELATED_NON_EQUIVALENT, not merged. See tests for the negative case.
++# --------------------------------------------------------------------------
++
++ALIAS_GROUPS = [
++    {"or", "odds ratio"},
++    {"ci", "confidence interval"},
++    {"rr", "relative risk"},
++    {"ari", "aris", "acute respiratory infection", "acute respiratory infections"},
++    {"ci", "ci."},
++]
++
++_ALIAS_CANONICAL = {}
++for _group in ALIAS_GROUPS:
++    _canon = sorted(_group, key=len)[-1]  # longest form as canonical label (for readability only)
++    for _member in _group:
++        _ALIAS_CANONICAL[_member] = _canon
++
++# Explicit "related but NOT equivalent" pairs -- documented so a reviewer
++# can see the merges we deliberately did NOT make, and why.
++RELATED_NOT_EQUIVALENT_PAIRS = {
++    frozenset({"rate ratio", "relative risk"}),
++    frozenset({"rate ratio", "rr"}),
++    frozenset({"rate ratio", "odds ratio"}),
++    frozenset({"relative risk", "odds ratio"}),
++}
++
++
++def _related_non_equivalent(norm_a: str, norm_b: str) -> bool:
++    return frozenset({norm_a, norm_b}) in RELATED_NOT_EQUIVALENT_PAIRS
++
++
++def classify_pair(text_a: str, text_b: str) -> EntityMatchResult:
++    """Classify a single (source, target) entity text pair. Pure function, no side effects."""
++    na_raw = normalize_entity_text(text_a)
++    nb_raw = normalize_entity_text(text_b)
++    na = normalize_plural(na_raw)
++    nb = normalize_plural(nb_raw)
++
++    if na == nb and na != "":
++        return EntityMatchResult(
++            text_a, text_b, na, nb, "exact_string", MatchCategory.EXACT, 1.0,
++            supporting_attributes=["identical after normalization"],
++            reason=f"'{na_raw}' == '{nb_raw}' after unicode/case/whitespace/plural normalization",
++        )
++
++    canon_a = _ALIAS_CANONICAL.get(na)
++    canon_b = _ALIAS_CANONICAL.get(nb)
++    if canon_a is not None and canon_a == canon_b:
++        return EntityMatchResult(
++            text_a, text_b, na, nb, "alias_table", MatchCategory.ALIAS, 1.0,
++            supporting_attributes=[f"both map to alias group '{canon_a}'"],
++            reason=f"'{na}' and '{nb}' are a known abbreviation/full-form pair (alias table)",
++        )
++
++    if _related_non_equivalent(na, nb):
++        return EntityMatchResult(
++            text_a, text_b, na, nb, "alias_table", MatchCategory.RELATED_NON_EQUIVALENT, 0.0,
++            conflicting_attributes=["distinct statistical measure"],
++            reason=f"'{na}' and '{nb}' are related epidemiological terms but are NOT the same "
++                   f"measure -- deliberately not merged",
++        )
++
++    if na and nb and len(na) >= 4 and len(nb) >= 4:
++        tokens_a = set(na.split())
++        tokens_b = set(nb.split())
++        shorter_tokens, longer_tokens = (tokens_a, tokens_b) if len(na) <= len(nb) else (tokens_b, tokens_a)
++        shorter_str, longer_str = (na, nb) if len(na) <= len(nb) else (nb, na)
++        # Token-boundary-aware containment only -- deliberately NOT a raw
++        # character substring check. Raw substring matching produces false
++        # positives on coincidental character runs (e.g. the token "aris"
++        # is a raw substring of "comparison" at character level, but the
++        # two share no actual words). Requiring every token of the shorter
++        # phrase to appear as a whole token of the longer phrase avoids
++        # that class of false match entirely.
++        if shorter_tokens and shorter_tokens.issubset(longer_tokens):
++            return EntityMatchResult(
++                text_a, text_b, na, nb, "substring", MatchCategory.PARTIAL, 0.5,
++                supporting_attributes=[f"'{shorter_str}' is contained in '{longer_str}' (token-level)"],
++                reason=f"'{shorter_str}' is a substring of '{longer_str}' -- treated as a partial, "
++                       f"lower-confidence match, not an equivalence",
++            )
++
++    return EntityMatchResult(
++        text_a, text_b, na, nb, "none", MatchCategory.UNKNOWN, 0.0,
++        reason="no exact, alias, or partial relationship found",
++    )
++
++
++def align_entities(entities_a, entities_b, threshold: float = 0.2) -> AlignmentResult:
++    """
++    entities_a / entities_b: iterables of dicts with a 'text' key (same shape
++    ClaimMatcher.match() already receives from Repository.get_claim_entities).
++
++    Returns an AlignmentResult whose overlap_score is a normalized,
++    weighted score in [0, 1]: matches are assigned with GREEDY ONE-TO-ONE
++    bipartite matching (each source entity may be consumed by at most one
++    match, and each target entity may be consumed by at most one match),
++    highest-scoring candidate pairs assigned first. This prevents a single
++    real-world entity from being counted multiple times just because
++    several near-duplicate surface forms on one side (e.g. "ARI" and
++    "ARIs" both extracted from the same claim) each independently match
++    the same entity on the other side -- see
++    tests/unit/test_entity_alignment.py::test_no_duplicate_target_matching
++    for the regression this fixes.
++
++    The final score is weighted_sum_of_assigned_matches / union_size,
++    where union_size is the count of distinct normalized entities across
++    both sides (the same Jaccard-style denominator as v1, so scores remain
++    directly comparable).
++    """
++    texts_a = [e.get("text") for e in entities_a]
++    texts_b = [e.get("text") for e in entities_b]
++    # malformed entries (missing/None text) normalize to "" and are excluded
++    # from consideration entirely rather than being coerced into a fake match.
++    texts_a = [t for t in texts_a if t]
++    texts_b = [t for t in texts_b if t]
++
++    if not (0.0 <= threshold <= 1.0):
++        raise ValueError(f"threshold must be within [0.0, 1.0], got {threshold!r}")
++
++    if not texts_a and not texts_b:
++        return AlignmentResult(0.0, threshold, False, [], [], [], "no entities on either side")
++
++    norm_a = {t: normalize_plural(normalize_entity_text(t)) for t in texts_a}
++    norm_b = {t: normalize_plural(normalize_entity_text(t)) for t in texts_b}
++    union_size = len({*norm_a.values(), *norm_b.values()})
++
++    # Build every candidate (source, target) pair that classifies as a
++    # contributing match, then assign greedily, highest score first, each
++    # side consumable only once -- this is what prevents double-counting.
++    candidates = []
++    for ta in texts_a:
++        for tb in texts_b:
++            r = classify_pair(ta, tb)
++            if r.category in (MatchCategory.EXACT, MatchCategory.ALIAS, MatchCategory.PARTIAL):
++                candidates.append(r)
++    # Stable sort: score descending, then original discovery order, so the
++    # assignment (and therefore the final overlap_score) is deterministic
++    # across repeated runs given the same input.
++    candidates.sort(key=lambda r: -r.score)
++
++    matches = []
++    matched_a, matched_b = set(), set()
++    for r in candidates:
++        if r.source_entity in matched_a or r.target_entity in matched_b:
++            continue
++        matches.append(r)
++        matched_a.add(r.source_entity)
++        matched_b.add(r.target_entity)
++
++    weighted_sum = sum(m.score for m in matches)
++    overlap_score = (weighted_sum / union_size) if union_size else 0.0
++    overlap_score = min(overlap_score, 1.0)
++
++    passed = overlap_score >= threshold
++    unmatched_source = [t for t in texts_a if t not in matched_a]
++    unmatched_target = [t for t in texts_b if t not in matched_b]
++    reason = "" if passed else (
++        f"weighted overlap {overlap_score:.3f} < threshold {threshold:.2f} "
++        f"({len(matches)} contributing match(es) out of {union_size} distinct entities)"
++    )
++    return AlignmentResult(overlap_score, threshold, passed, matches,
++                            unmatched_source, unmatched_target, reason)
+diff --git a/scripts/diagnose_entity_alignment_v2.py b/scripts/diagnose_entity_alignment_v2.py
+new file mode 100644
+index 0000000..acf2e6f
+--- /dev/null
++++ b/scripts/diagnose_entity_alignment_v2.py
+@@ -0,0 +1,120 @@
++"""
++scripts/diagnose_entity_alignment_v2.py
++
++READ-ONLY diagnostic. Does not write to any database. Does not modify
++reviewed_claim_mapping.json. Does not change any threshold.
++
++Compares v1 (exact-string) vs v2 (normalized + alias-aware) entity overlap
++for the 4 cross-paper, fully-mapped reviewed benchmark pairs, using the
++real entities already stored in the target database. This is the source
++of the numbers documented in matching/entity_alignment.py's module
++docstring and in the invention-disclosure/audit documents.
++
++Usage:
++    python scripts/diagnose_entity_alignment_v2.py --db experiments/runs/experiment.db
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import sqlite3
++from pathlib import Path
++
++from matching.entity_alignment import align_entities
++
++PROJECT_ROOT = Path(__file__).resolve().parent.parent
++
++
++def get_entities(conn, claim_id):
++    rows = conn.execute(
++        "SELECT e.text FROM claim_entities ce JOIN entities e ON ce.entity_id = e.entity_id "
++        "WHERE ce.claim_id = ?",
++        (claim_id,),
++    ).fetchall()
++    return [{"text": r[0]} for r in rows]
++
++
++def v1_overlap(entities_a, entities_b):
++    ea = {e["text"].strip().lower() for e in entities_a}
++    eb = {e["text"].strip().lower() for e in entities_b}
++    u = ea | eb
++    return len(ea & eb) / len(u) if u else 0.0
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--db", required=True)
++    parser.add_argument("--threshold", type=float, default=0.20)
++    parser.add_argument(
++        "--mapping",
++        default=str(PROJECT_ROOT / "experiments" / "annotations" / "reviewed_claim_mapping.json"),
++    )
++    parser.add_argument(
++        "--out",
++        default=str(PROJECT_ROOT / "experiments" / "results" / "entity_alignment_v2_diagnostic.json"),
++    )
++    args = parser.parse_args()
++
++    mapping = json.loads(Path(args.mapping).read_text())["mappings"]
++    conn = sqlite3.connect(args.db)  # opened read-only in effect: no INSERT/UPDATE/DELETE ever issued below
++
++    results = {}
++    for pair_id, entry in mapping.items():
++        a = entry.get("claim_a", {})
++        b = entry.get("claim_b", {})
++        ca, cb = a.get("db_claim_id"), b.get("db_claim_id")
++        if ca is None or cb is None:
++            results[pair_id] = {"status": "UNRESOLVED"}
++            continue
++        pa = conn.execute("SELECT paper_id FROM claims WHERE claim_id=?", (ca,)).fetchone()
++        pb = conn.execute("SELECT paper_id FROM claims WHERE claim_id=?", (cb,)).fetchone()
++        if pa is None or pb is None:
++            results[pair_id] = {"status": "CLAIM_NOT_FOUND"}
++            continue
++        if pa[0] == pb[0]:
++            results[pair_id] = {"status": "OUT_OF_SCOPE_SAME_PAPER"}
++            continue
++
++        entities_a = get_entities(conn, ca)
++        entities_b = get_entities(conn, cb)
++        v1 = v1_overlap(entities_a, entities_b)
++        v2_result = align_entities(entities_a, entities_b, threshold=args.threshold)
++
++        results[pair_id] = {
++            "status": "EVALUATED_CROSS_PAPER",
++            "claim_a_id": ca,
++            "claim_b_id": cb,
++            "v1_overlap": round(v1, 4),
++            "v1_passed": v1 >= args.threshold,
++            "v2_overlap": round(v2_result.overlap_score, 4),
++            "v2_passed": v2_result.passed,
++            "v2_matches": [
++                {
++                    "source": m.source_entity,
++                    "target": m.target_entity,
++                    "category": m.category.value,
++                    "score": m.score,
++                    "reason": m.reason,
++                }
++                for m in v2_result.matches
++            ],
++            "v2_rejection_reason": v2_result.rejection_reason,
++        }
++
++    output = {
++        "threshold": args.threshold,
++        "source_database": args.db,
++        "note": "Diagnostic only. Read-only: no database or mapping file was modified. "
++                "n=4 evaluable cross-paper pairs -- not a statistically valid benchmark.",
++        "results": results,
++    }
++
++    out_path = Path(args.out)
++    out_path.parent.mkdir(parents=True, exist_ok=True)
++    out_path.write_text(json.dumps(output, indent=2))
++    print(json.dumps(output, indent=2))
++    print(f"\nWritten to: {out_path}")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tests/unit/test_claim_matcher_backward_compat.py b/tests/unit/test_claim_matcher_backward_compat.py
+new file mode 100644
+index 0000000..d177b1e
+--- /dev/null
++++ b/tests/unit/test_claim_matcher_backward_compat.py
+@@ -0,0 +1,90 @@
++"""
++Regression guard: ClaimMatcher's DEFAULT behavior (entity_alignment_version
++not passed, i.e. "v1") must remain exactly what it was before
++entity_alignment.py existed. Every previously-documented result
++(README.md, experiment reports, curated_comparison_real_models.json) was
++produced under v1 -- if this test ever fails, those documented numbers are
++no longer reproducible from the current code.
++"""
++from __future__ import annotations
++
++from unittest.mock import MagicMock
++
++from matching.claim_matcher import ClaimMatcher
++
++
++def _fake_nli():
++    nli = MagicMock()
++    result = MagicMock()
++    result.label = "entailment"
++    result.confidence = 0.9
++    result.entailment = 0.9
++    result.contradiction = 0.05
++    result.neutral = 0.05
++    nli.predict_bidirectional.return_value = result
++    return nli
++
++
++def test_default_entity_alignment_version_is_v1():
++    matcher = ClaimMatcher(nli=_fake_nli())
++    assert matcher.entity_alignment_version == "v1"
++
++
++def test_v1_overlap_matches_pre_existing_exact_string_behavior():
++    """
++    Real entity sets from the reviewed benchmark pair gt_01 (claims 4 vs
++    13 in experiments/runs/experiment.db). The v1 exact-string overlap for
++    this pair was 0.1667 before entity_alignment.py existed -- this must
++    not change.
++    """
++    matcher = ClaimMatcher(nli=_fake_nli())  # no entity_alignment_version passed -> v1
++    entities_a = [{"text": t} for t in
++                  ["comparison", "vitamin D", "placebo", "intervention", "ARI", "risk", "OR", "CI", "studies"]]
++    entities_b = [{"text": t} for t in
++                  ["individual", "patient", "statistically significant", "effect", "vitamin D", "ARI",
++                   "risk", "ARIs", "treatment group", "pooled", "odds ratio", "rate ratio"]]
++    claim_a = {"claim_id": 4, "text": "placeholder a"}
++    claim_b = {"claim_id": 13, "text": "placeholder b"}
++    emb = [1.0, 0.0, 0.0]
++
++    decision = matcher.match(claim_a, claim_b, entities_a, entities_b, [], [], emb, emb)
++
++    # v1 must still reject this pair at the entity gate (0.1667 < 0.20),
++    # exactly as it did before v2 existed.
++    assert decision is None
++
++
++def test_v1_decision_has_no_alignment_detail():
++    matcher = ClaimMatcher(nli=_fake_nli())
++    entities = [{"text": "vitamin D"}]
++    emb = [1.0, 0.0, 0.0]
++    claim = {"claim_id": 1, "text": "x"}
++    claim2 = {"claim_id": 2, "text": "y"}
++    decision = matcher.match(claim, claim2, entities, entities, [], [], emb, emb)
++    assert decision is not None
++    assert decision.entity_alignment_detail is None
++
++
++def test_v2_must_be_explicitly_requested():
++    matcher = ClaimMatcher(nli=_fake_nli(), entity_alignment_version="v2")
++    entities_a = [{"text": t} for t in
++                  ["comparison", "vitamin D", "placebo", "intervention", "ARI", "risk", "OR", "CI", "studies"]]
++    entities_b = [{"text": t} for t in
++                  ["individual", "patient", "statistically significant", "effect", "vitamin D", "ARI",
++                   "risk", "ARIs", "treatment group", "pooled", "odds ratio", "rate ratio"]]
++    claim_a = {"claim_id": 4, "text": "placeholder a"}
++    claim_b = {"claim_id": 13, "text": "placeholder b"}
++    emb = [1.0, 0.0, 0.0]
++
++    decision = matcher.match(claim_a, claim_b, entities_a, entities_b, [], [], emb, emb)
++
++    # with v2 explicitly requested, this real pair now clears the gate
++    assert decision is not None
++    assert decision.entity_alignment_detail is not None
++    assert decision.entity_alignment_detail.passed is True
++
++
++def test_invalid_entity_alignment_version_rejected():
++    import pytest
++    with pytest.raises(ValueError):
++        ClaimMatcher(nli=_fake_nli(), entity_alignment_version="v3")
+diff --git a/tests/unit/test_entity_alignment.py b/tests/unit/test_entity_alignment.py
+new file mode 100644
+index 0000000..467104c
+--- /dev/null
++++ b/tests/unit/test_entity_alignment.py
+@@ -0,0 +1,184 @@
++"""
++Tests for matching/entity_alignment.py (Entity Alignment V2).
++
++These tests exist to prove two things at once:
++1. The improved alignment recovers genuine matches that the v1 exact-string
++   comparison misses (normalization, alias, partial containment).
++2. It does NOT create false matches between scientifically different
++   entities -- this is the more important guarantee, per the explicit
++   requirement that improving recall must not come at the cost of
++   precision on unrelated entities.
++"""
++from __future__ import annotations
++
++import pytest
++
++from matching.entity_alignment import (
++    align_entities,
++    classify_pair,
++    normalize_entity_text,
++    normalize_plural,
++    MatchCategory,
++)
++
++
++# --------------------------------------------------------------------------
++# Normalization
++# --------------------------------------------------------------------------
++
++def test_normalize_strips_case_whitespace_and_punctuation():
++    assert normalize_entity_text("  Vitamin D  ") == "vitamin d"
++    assert normalize_entity_text("ARI.") == "ari"
++    assert normalize_entity_text("(placebo)") == "placebo"
++
++
++def test_normalize_unicode_nfkc():
++    # full-width and combining-character variants should normalize to the
++    # same plain ASCII form
++    assert normalize_entity_text("vitamin D\u00A0") == normalize_entity_text("vitamin D")
++
++
++def test_plural_normalization_is_conservative():
++    assert normalize_plural("trials") == "trial"
++    assert normalize_plural("aris") == "aris"       # explicit exception, len==4
++    assert normalize_plural("sars") == "sars"       # explicit exception
++    assert normalize_plural("os") == "os"           # too short to touch
++    assert normalize_plural("class") == "class"     # ends in "ss", left alone
++
++
++# --------------------------------------------------------------------------
++# Positive cases -- real matches v1 would miss
++# --------------------------------------------------------------------------
++
++def test_exact_match_after_case_normalization():
++    r = classify_pair("Vitamin D", "vitamin d")
++    assert r.category == MatchCategory.EXACT
++    assert r.score == 1.0
++
++
++def test_alias_or_odds_ratio():
++    r = classify_pair("OR", "odds ratio")
++    assert r.category == MatchCategory.ALIAS
++    assert r.score == 1.0
++
++
++def test_alias_ari_plural_and_full_form():
++    r = classify_pair("ARIs", "ARI")
++    assert r.category == MatchCategory.ALIAS
++
++    r2 = classify_pair("ARI", "acute respiratory infection")
++    assert r2.category == MatchCategory.ALIAS
++
++
++def test_partial_match_token_level_containment():
++    r = classify_pair("vitamin D supplements", "vitamin D")
++    assert r.category == MatchCategory.PARTIAL
++    assert r.score == 0.5
++
++
++# --------------------------------------------------------------------------
++# Negative cases -- must NOT merge (this is the important guarantee)
++# --------------------------------------------------------------------------
++
++def test_does_not_merge_unrelated_entities():
++    r = classify_pair("vitamin D", "vitamin K")
++    assert r.category == MatchCategory.UNKNOWN
++    assert r.score == 0.0
++
++    r2 = classify_pair("placebo", "vitamin D")
++    assert r2.category == MatchCategory.UNKNOWN
++
++
++def test_does_not_merge_related_but_distinct_measures():
++    """
++    Rate ratio, relative risk, and odds ratio are related epidemiological
++    quantities but are NOT interchangeable. The alias table must not
++    conflate them.
++    """
++    r = classify_pair("rate ratio", "relative risk")
++    assert r.category == MatchCategory.RELATED_NON_EQUIVALENT
++    assert r.score == 0.0
++
++    r2 = classify_pair("rate ratio", "RR")
++    assert r2.category == MatchCategory.RELATED_NON_EQUIVALENT
++
++    r3 = classify_pair("rate ratio", "odds ratio")
++    assert r3.category == MatchCategory.RELATED_NON_EQUIVALENT
++
++
++def test_regression_no_coincidental_character_substring_match():
++    """
++    Regression test for a real bug caught during development: a raw
++    character-level substring check found "aris" inside "comparison"
++    (positions 4-7: c-o-m-P-A-R-I-S-o-n) and incorrectly classified them
++    as a partial match. Partial matching must be token-boundary-aware.
++    """
++    r = classify_pair("comparison", "ARIs")
++    assert r.category == MatchCategory.UNKNOWN, (
++        "‘comparison’ and ‘ARIs’ share no actual words and must not be "
++        "reported as a partial match just because ‘aris’ is a character "
++        "substring of ‘comparison’."
++    )
++
++
++def test_short_strings_do_not_trigger_partial_matching():
++    # both below the length-4 floor -- must fall through to UNKNOWN, not
++    # a spurious partial/substring hit
++    r = classify_pair("or", "risk")
++    assert r.category != MatchCategory.PARTIAL
++
++
++# --------------------------------------------------------------------------
++# align_entities() -- the aggregate score used as ClaimMatcher's entity gate
++# --------------------------------------------------------------------------
++
++def test_align_entities_empty_sets():
++    res = align_entities([], [], threshold=0.2)
++    assert res.overlap_score == 0.0
++    assert res.passed is False
++
++
++def test_align_entities_real_gt01_pair_now_passes():
++    """
++    Real reviewed-benchmark pair (gt_01, claims 4 vs 13 in
++    experiments/runs/experiment.db). v1 exact-string overlap = 0.167,
++    below the 0.20 gate. v2 recovers this via one alias match (OR <->
++    odds ratio) with no other entities altered, and passes at 0.222.
++    """
++    entities_a = [{"text": t} for t in
++                  ["comparison", "vitamin D", "placebo", "intervention", "ARI", "risk", "OR", "CI", "studies"]]
++    entities_b = [{"text": t} for t in
++                  ["individual", "patient", "statistically significant", "effect", "vitamin D", "ARI",
++                   "risk", "ARIs", "treatment group", "pooled", "odds ratio", "rate ratio"]]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    assert res.passed is True
++    assert res.overlap_score == pytest.approx(0.222, abs=0.01)
++    categories = {m.category for m in res.matches}
++    assert MatchCategory.ALIAS in categories
++
++
++def test_align_entities_real_gt02_pair_still_correctly_rejected():
++    """
++    Same corpus, gt_02 (claims 4 vs 26): no abbreviation overlap exists
++    between these two claims' real entities, so v2 correctly still
++    rejects this pair -- proving v2 does not just pass everything.
++    """
++    entities_a = [{"text": t} for t in
++                  ["comparison", "vitamin D", "placebo", "intervention", "ARI", "risk", "OR", "CI", "studies"]]
++    entities_b = [{"text": t} for t in
++                  ["CONCLUSIONS", "adults", "baseline", "prevalence", "sub-optimal", "vitamin D",
++                   "implementation", "population-level", "vitamin D replacement", "risk", "ARI", "COVID-19"]]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    assert res.passed is False
++    assert res.overlap_score == pytest.approx(0.167, abs=0.01)
++
++
++def test_alignment_result_is_explainable():
++    entities_a = [{"text": "OR"}]
++    entities_b = [{"text": "odds ratio"}]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    assert res.passed is True
++    assert len(res.matches) == 1
++    m = res.matches[0]
++    assert m.strategy == "alias_table"
++    assert m.reason  # every decision carries a human-readable reason
+diff --git a/tests/unit/test_entity_alignment_stabilization.py b/tests/unit/test_entity_alignment_stabilization.py
+new file mode 100644
+index 0000000..2d30b58
+--- /dev/null
++++ b/tests/unit/test_entity_alignment_stabilization.py
+@@ -0,0 +1,188 @@
++"""
++Stabilization checkpoint tests for Entity Alignment V2.
++
++These were added during a formal review pass AFTER the initial
++implementation, specifically to hunt for the failure classes called out in
++that review: unsafe aliases, ambiguous abbreviations, incorrect plural
++normalization, partial-match/token-boundary errors, duplicate matching of
++the same entity, malformed input, and non-determinism.
++
++One real bug was found and fixed by this pass (see
++test_no_duplicate_target_matching below) -- documented here, not hidden.
++"""
++from __future__ import annotations
++
++import pytest
++
++from matching.entity_alignment import align_entities, classify_pair, MatchCategory
++
++
++# --------------------------------------------------------------------------
++# Malformed / empty input
++# --------------------------------------------------------------------------
++
++def test_empty_string_entities_do_not_match_each_other():
++    r = classify_pair("", "")
++    assert r.category == MatchCategory.UNKNOWN
++    assert r.score == 0.0
++
++
++def test_none_entity_text_handled_without_crash():
++    r = classify_pair(None, "vitamin D")
++    assert r.category == MatchCategory.UNKNOWN
++
++
++def test_align_entities_with_none_and_missing_text_key():
++    """
++    entities_a contains a None text, an empty string, and a dict missing
++    the 'text' key entirely -- none of these should crash align_entities
++    or be silently treated as matching anything.
++    """
++    entities_a = [{"text": None}, {"text": ""}, {}]
++    entities_b = [{"text": "vitamin D"}]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    assert res.passed is False
++    assert res.overlap_score == 0.0
++
++
++def test_align_entities_both_sides_empty():
++    res = align_entities([], [], threshold=0.2)
++    assert res.overlap_score == 0.0
++    assert res.passed is False
++    assert res.rejection_reason
++
++
++# --------------------------------------------------------------------------
++# Duplicate matching of the same entity (real bug found during review)
++# --------------------------------------------------------------------------
++
++def test_no_duplicate_target_matching():
++    """
++    Regression test for a real bug found during the stabilization review:
++    two near-duplicate source entities ("ARI" and "ARIs", both extracted
++    from the same claim) each independently matched the same single target
++    entity ("acute respiratory infection"), and the old implementation
++    counted BOTH matches, inflating the overlap score (0.667 instead of
++    the correct 0.333 -- since there are 2 distinct source entities but
++    only 1 distinct concept in the union once aliasing is applied).
++
++    Fixed via greedy one-to-one bipartite assignment: each target entity
++    can be consumed by at most one source match.
++    """
++    entities_a = [{"text": "ARI"}, {"text": "ARIs"}]
++    entities_b = [{"text": "acute respiratory infection"}]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++
++    assert len(res.matches) == 1, "the single target entity must only be consumed once"
++    assert res.overlap_score == pytest.approx(1 / 3, abs=0.01)
++    assert res.unmatched_source == ["ARIs"] or res.unmatched_source == ["ARI"]
++
++
++def test_no_duplicate_source_matching():
++    """Symmetric case: two target entities should not both be claimed by one source."""
++    entities_a = [{"text": "acute respiratory infection"}]
++    entities_b = [{"text": "ARI"}, {"text": "ARIs"}]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    assert len(res.matches) == 1
++
++
++# --------------------------------------------------------------------------
++# Unicode / punctuation variants
++# --------------------------------------------------------------------------
++
++def test_unicode_nbsp_and_curly_quotes_normalize_consistently():
++    # non-breaking space vs regular space
++    r = classify_pair("vitamin D\u00A0supplement", "vitamin D supplement")
++    assert r.category == MatchCategory.EXACT
++
++
++def test_punctuation_variants_normalize_to_same_entity():
++    r1 = classify_pair("(placebo)", "placebo")
++    assert r1.category == MatchCategory.EXACT
++    r2 = classify_pair("ARI.", "ARI")
++    assert r2.category == MatchCategory.EXACT
++    r3 = classify_pair("odds ratio;", "odds ratio")
++    assert r3.category == MatchCategory.EXACT
++
++
++# --------------------------------------------------------------------------
++# Ambiguous abbreviations / documented false-positive risk
++# --------------------------------------------------------------------------
++
++def test_or_alias_is_a_known_ambiguity_risk():
++    """
++    "OR" is aliased to "odds ratio" for legitimate statistical claim
++    matching, but "OR" is also an ordinary English word/logical
++    connective. This module has no way to distinguish "the OR (odds
++    ratio) was 0.94" from a hypothetical extraction error that pulled out
++    a bare "OR" meaning "or". This test documents the CURRENT accepted
++    behavior (treat any standalone "OR" as odds-ratio) and its risk,
++    rather than hiding it: this alias is scoped to short, capitalized,
++    standalone tokens as extracted by scientific NER over biomedical text,
++    where "OR" essentially always denotes odds ratio in practice. If this
++    system is ever pointed at non-biomedical or non-statistical text, this
++    alias should be reviewed -- it is NOT universally safe.
++    """
++    r = classify_pair("OR", "odds ratio")
++    assert r.category == MatchCategory.ALIAS  # current, documented, accepted behavior
++
++
++def test_rr_alias_is_context_dependent_not_universally_safe():
++    """
++    "RR" is aliased here to "relative risk" only. In some study designs
++    (e.g. person-time / incidence-rate studies) "RR" is conventionally
++    used for "rate ratio" instead -- a related but distinct measure from
++    relative risk. This alias is therefore CONTEXT-DEPENDENT, not
++    universally safe: on a corpus that uses "RR" to mean rate ratio, this
++    alias would produce a false equivalence. Documented here as a known,
++    accepted risk (the ALIAS_GROUPS table comment references this test).
++    """
++    r = classify_pair("RR", "relative risk")
++    assert r.category == MatchCategory.ALIAS  # current, documented, accepted behavior
++    # but rate ratio is explicitly NOT merged with either RR or relative risk:
++    r2 = classify_pair("RR", "rate ratio")
++    assert r2.category == MatchCategory.RELATED_NON_EQUIVALENT
++
++
++# --------------------------------------------------------------------------
++# Determinism and stable ordering
++# --------------------------------------------------------------------------
++
++def test_deterministic_across_repeated_calls():
++    entities_a = [{"text": "OR"}, {"text": "ARI"}, {"text": "vitamin D"}]
++    entities_b = [{"text": "odds ratio"}, {"text": "ARIs"}, {"text": "vitamin D"}]
++    r1 = align_entities(entities_a, entities_b, threshold=0.2)
++    r2 = align_entities(entities_a, entities_b, threshold=0.2)
++    assert r1.overlap_score == r2.overlap_score
++    assert [(m.source_entity, m.target_entity) for m in r1.matches] == \
++           [(m.source_entity, m.target_entity) for m in r2.matches]
++
++
++def test_match_order_is_stable_score_descending():
++    entities_a = [{"text": "OR"}, {"text": "vitamin D"}, {"text": "placebo"}]
++    entities_b = [{"text": "odds ratio"}, {"text": "vitamin D"}, {"text": "placebo"}]
++    res = align_entities(entities_a, entities_b, threshold=0.2)
++    scores = [m.score for m in res.matches]
++    assert scores == sorted(scores, reverse=True)
++
++
++# --------------------------------------------------------------------------
++# Invalid threshold values
++# --------------------------------------------------------------------------
++
++def test_negative_threshold_rejected():
++    with pytest.raises(ValueError):
++        align_entities([{"text": "a"}], [{"text": "b"}], threshold=-0.1)
++
++
++def test_threshold_above_one_rejected():
++    with pytest.raises(ValueError):
++        align_entities([{"text": "a"}], [{"text": "b"}], threshold=1.5)
++
++
++def test_boundary_thresholds_are_valid():
++    # 0.0 and 1.0 are legal boundary values and must not raise
++    r0 = align_entities([{"text": "a"}], [{"text": "b"}], threshold=0.0)
++    assert r0.passed is True  # everything clears a 0.0 gate
++    r1 = align_entities([{"text": "vitamin D"}], [{"text": "vitamin D"}], threshold=1.0)
++    assert r1.passed is True  # exact match reaches the 1.0 ceiling exactly

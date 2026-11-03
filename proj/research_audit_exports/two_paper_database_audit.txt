@@ -1,0 +1,89 @@
+TWO-PAPER CASE-STUDY SQLITE DATABASE FORENSIC AUDIT
+===============================================================================
+Session ID: session_20261028_173527_bb5398
+Database File: proj/experiments/runs/sessions/session_20261028_173527_bb5398.db
+Database File Size: 3,366,912 bytes
+Creation Timestamp: 2026-10-28T17:35:27.658285
+Status: COMPLETED
+Execution Mode: Read-Only SQLite Inspection
+
+1. VERIFIED DATABASE COUNTS DIRECTLY FROM SQL
+-------------------------------------------------------------------------------
+1. Number of uploaded papers: 2
+   - Paper 1: GlobalCropYield.pdf (179 claims extracted)
+   - Paper 2: SageMICpaper2020.pdf (221 claims extracted)
+2. Number of extracted claims: 400 (179 + 221 = 400)
+3. Number of evidence-pair records: 815
+   - All 815 pairs are cross-document pairs between Paper 1 and Paper 2.
+4. Number of graph edges:
+   - Raw total in evidence_graph_edges table: 4542
+   - Scoped query in session_manager.py: 4427
+   - Difference: Exactly 115 entity-entity relation edges.
+5. Number of research-gap records: 333
+6. Reliability scores:
+   - Total rows in aerf_scores: 556
+   - Current claim scores (is_current = 1): 400
+   - Historical pre-update snapshots (is_current = 0): 156
+   - Mean of ALL 556 scores: 0.2718 (displayed as 0.272) | Max: 0.4422 | Min: 0.1606
+   - Mean of 400 CURRENT scores: 0.2604 (displayed as 0.260) | Max: 0.4422 | Min: 0.1879
+7. Number of temporal reliability updates: 56 records in aerf_score_history
+8. Number of extracted scientific relations: 115 records in relations table
+9. Supporting relationships: 54 (6.63% of pairs)
+10. Contradicting relationships: 60 (7.36% of pairs)
+    - Neutral relationships: 669 (82.09% of pairs)
+    - Uncertain relationships: 32 (3.93% of pairs)
+11. Agreement-rate calculation and denominator:
+    - Formula in ui/app.py (lines 3047-3049):
+      agree_denom = len(sup_pairs) + len(con_pairs)
+      agree_pct = (len(sup_pairs) / agree_denom * 100)
+    - Calculation: 54 supports / (54 supports + 60 contradicts) = 54 / 114 = 47.368% (displayed as 47.4%)
+    - Denominator: Exactly 114 stance-bearing claim pairs. Neutral (669) and uncertain (32) pairs are excluded.
+
+2. FORENSIC RECONCILIATION OF DASHBOARD DISCREPANCIES
+-------------------------------------------------------------------------------
+DISCREPANCY A: 4,542 Graph Edges in Overview/Evidence Graph vs. 4,427 in New Analysis
+-------------------------------------------------------------------------------------
+- Root Cause Identified: DIFFERENT AGGREGATION QUERIES WITH NODE-TYPE FILTERING.
+- In Overview & Evidence Graph (ui/app.py lines 690 & 1940):
+  The dashboard calls read_table("evidence_graph_edges"), reading all rows directly:
+  SELECT COUNT(*) FROM evidence_graph_edges -> Exactly 4,542 rows.
+  Breakdown by node types:
+  * (claim, claim): 1,566 edges (supports, contradicts, neutral)
+  * (claim, entity): 2,861 edges (mentions)
+  * (entity, entity): 115 edges (extracted scientific relations: cause=5, improve=11, increase=72, reduce=26, treat=1)
+  * Sum: 1,566 + 2,861 + 115 = 4,542 edges.
+- In New Analysis (ui/app.py line 2969 / pipeline/session_manager.py line 226):
+  The dashboard calls get_graph_edges_by_paper_ids([1, 2]):
+  SELECT e.* FROM evidence_graph_edges e
+  WHERE (e.source_node_type = 'claim' AND e.source_node_id IN (SELECT claim_id FROM claims WHERE paper_id IN (1, 2)))
+     OR (e.target_node_type = 'claim' AND e.target_node_id IN (SELECT claim_id FROM claims WHERE paper_id IN (1, 2)))
+  This query strictly requires that at least one endpoint has node_type = 'claim'.
+  Consequently, it selects the 1,566 claim-claim edges and 2,861 claim-entity edges (1,566 + 2,861 = 4,427),
+  but EXCLUDES the 115 entity-entity edges because neither endpoint is a claim!
+- Resolution: Both counts are mathematically correct representations of different queries:
+  * 4,542 is the total graph size including entity-entity relation edges.
+  * 4,427 is the claim-anchored subgraph size.
+
+DISCREPANCY B: Mean Reliability 0.272 in AERF Reliability Page vs. 0.260 in New Analysis
+----------------------------------------------------------------------------------------
+- Root Cause Identified: HISTORICAL PRE-UPDATE RECORDS INCLUDED VS. CURRENT RECORDS ONLY.
+- In Dedicated AERF Reliability Page (ui/app.py lines 1522 & 1620):
+  The page executes:
+  scores = read_table("aerf_scores")
+  valid_scores = scores["score"].dropna()
+  valid_scores.mean()
+  This reads ALL 556 records in aerf_scores without filtering by is_current = 1.
+  During Phase 3 adaptive updating, 156 historical score records were created with is_current = 0.
+  Averaging all 556 rows yields:
+  SELECT AVG(score) FROM aerf_scores -> 0.2718 -> Displayed as 0.272 (Max: 0.442, Min: 0.161).
+- In New Analysis (ui/app.py line 2968 / pipeline/session_manager.py line 225 & 233):
+  The page executes repo.get_aerf_scores_by_paper_ids([1, 2]):
+  SELECT s.score FROM aerf_scores s JOIN claims c ON s.claim_id = c.claim_id
+  WHERE c.paper_id IN (1, 2) AND s.is_current = 1
+  This strictly filters for CURRENT active scores, evaluating exactly 1 score per claim (400 scores).
+  Averaging these 400 current scores yields:
+  SELECT AVG(score) FROM aerf_scores WHERE is_current = 1 -> 0.2604 -> Displayed as 0.260 (Max: 0.442, Min: 0.188).
+- Resolution:
+  * 0.260 is the authoritative mean reliability of the 400 extracted claims in their finalized state.
+  * 0.272 is an artifact of the dedicated UI page omitting the 'is_current = 1' filter, thereby blending
+    interim pre-update scores with finalized scores.

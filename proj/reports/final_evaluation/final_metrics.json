@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-10-26T14:32:55Z",
+  "development_benchmark": {
+    "dataset": "tests/data/claim_extractor_eval.csv",
+    "provenance": "Verified Human Expert Curated Benchmark",
+    "majority_class_baseline": {
+      "n": 80,
+      "accuracy": 0.575,
+      "accuracy_ci": [
+        0.4657,
+        0.6774
+      ],
+      "precision_claim": 0.0,
+      "precision_claim_ci": [
+        0.0,
+        0.0
+      ],
+      "recall_claim": 0.0,
+      "recall_claim_ci": [
+        0.0,
+        0.1015
+      ],
+      "f1_claim": 0.0,
+      "precision_non_claim": 0.575,
+      "recall_non_claim": 1.0,
+      "f1_non_claim": 0.7302,
+      "macro_f1": 0.3651,
+      "weighted_f1": 0.4198,
+      "tp": 0,
+      "fp": 0,
+      "fn": 34,
+      "tn": 46
+    },
+    "rule_based_keyword_baseline": {
+      "n": 80,
+      "accuracy": 0.6625,
+      "accuracy_ci": [
+        0.5536,
+        0.7565
+      ],
+      "precision_claim": 0.8889,
+      "precision_claim_ci": [
+        0.565,
+        0.9801
+      ],
+      "recall_claim": 0.2353,
+      "recall_claim_ci": [
+        0.1244,
+        0.4
+      ],
+      "f1_claim": 0.3721,
+      "precision_non_claim": 0.6338,
+      "recall_non_claim": 0.9783,
+      "f1_non_claim": 0.7692,
+      "macro_f1": 0.5707,
+      "weighted_f1": 0.6004,
+      "tp": 8,
+      "fp": 1,
+      "fn": 26,
+      "tn": 45
+    },
+    "baseline_extractor": {
+      "n": 80,
+      "accuracy": 0.8375,
+      "accuracy_ci": [
+        0.7416,
+        0.9025
+      ],
+      "precision_claim": 0.7333,
+      "precision_claim_ci": [
+        0.5896,
+        0.8404
+      ],
+      "recall_claim": 0.9706,
+      "recall_claim_ci": [
+        0.8508,
+        0.9948
+      ],
+      "f1_claim": 0.8354,
+      "precision_non_claim": 0.9714,
+      "recall_non_claim": 0.7391,
+      "f1_non_claim": 0.8395,
+      "macro_f1": 0.8375,
+      "weighted_f1": 0.8378,
+      "tp": 33,
+      "fp": 12,
+      "fn": 1,
+      "tn": 34
+    },
+    "improved_aerf_2_extractor": {
+      "n": 80,
+      "accuracy": 0.9125,
+      "accuracy_ci": [
+        0.8302,
+        0.957
+      ],
+      "precision_claim": 0.8293,
+      "precision_claim_ci": [
+        0.6874,
+        0.9147
+      ],
+      "recall_claim": 1.0,
+      "recall_claim_ci": [
+        0.8985,
+        1.0
+      ],
+      "f1_claim": 0.9067,
+      "precision_non_claim": 1.0,
+      "recall_non_claim": 0.8478,
+      "f1_non_claim": 0.9176,
+      "macro_f1": 0.9122,
+      "weighted_f1": 0.913,
+      "tp": 34,
+      "fp": 7,
+      "fn": 0,
+      "tn": 39
+    },
+    "improvement_delta": {
+      "accuracy": 0.075,
+      "precision_claim": 0.096,
+      "recall_claim": 0.0294,
+      "f1_claim": 0.0713,
+      "macro_f1": 0.0747
+    }
+  },
+  "independent_provisional_benchmark": {
+    "dataset": "tests/data/independent_eval/claim_extractor_independent_provisional_eval.csv",
+    "provenance": "PROVISIONAL_AI_PREDICTION_UNVERIFIED",
+    "provisional_limitation_statement": "Ground-truth labels are unverified AI-generated consensus; metrics reflect inter-model agreement rates, not validated human benchmark ground truth.",
+    "baseline_extractor": {
+      "n": 143,
+      "accuracy": 0.4685,
+      "accuracy_ci": [
+        0.3886,
+        0.5501
+      ],
+      "precision_claim": 0.8511,
+      "precision_claim_ci": [
+        0.7231,
+        0.9259
+      ],
+      "recall_claim": 0.367,
+      "recall_claim_ci": [
+        0.2825,
+        0.4605
+      ],
+      "f1_claim": 0.5128,
+      "precision_non_claim": 0.2812,
+      "recall_non_claim": 0.7941,
+      "f1_non_claim": 0.4154,
+      "macro_f1": 0.4641,
+      "weighted_f1": 0.4897,
+      "tp": 40,
+      "fp": 7,
+      "fn": 69,
+      "tn": 27
+    },
+    "improved_aerf_2_extractor": {
+      "n": 143,
+      "accuracy": 0.8182,
+      "accuracy_ci": [
+        0.7469,
+        0.8728
+      ],
+      "precision_claim": 0.9029,
+      "precision_claim_ci": [
+        0.8304,
+        0.9464
+      ],
+      "recall_claim": 0.8532,
+      "recall_claim_ci": [
+        0.7748,
+        0.9076
+      ],
+      "f1_claim": 0.8774,
+      "precision_non_claim": 0.6,
+      "recall_non_claim": 0.7059,
+      "f1_non_claim": 0.6486,
+      "macro_f1": 0.763,
+      "weighted_f1": 0.823,
+      "tp": 93,
+      "fp": 10,
+      "fn": 16,
+      "tn": 24
+    }
+  }
+}

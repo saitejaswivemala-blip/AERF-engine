@@ -1,0 +1,168 @@
+
+from pathlib import Path
+import csv
+import json
+
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    classification_report,
+)
+
+from nlp.claim_extractor import ScientificClaimExtractor
+
+
+ROOT = Path(__file__).resolve().parent
+DATASET = ROOT / "tests" / "data" / "claim_extractor_eval.csv"
+REPORT_DIR = ROOT / "reports"
+
+
+def main():
+    if not DATASET.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {DATASET}\n"
+            "Create tests/data/claim_extractor_eval.csv first."
+        )
+
+    with DATASET.open("r", encoding="utf-8-sig", newline="") as file:
+        reader = csv.DictReader(file)
+        if not {"sentence", "label"}.issubset(reader.fieldnames or []):
+            raise ValueError("CSV must have sentence,label columns.")
+        rows = list(reader)
+
+    sentences = []
+    actual = []
+
+    for row in rows:
+        sentence = (row.get("sentence") or "").strip()
+        label = (row.get("label") or "").strip()
+
+        if not sentence or label not in {"0", "1"}:
+            raise ValueError(f"Invalid dataset row: {row}")
+
+        sentences.append(sentence)
+        actual.append(int(label))
+
+    if not actual or len(set(actual)) != 2:
+        raise ValueError("Dataset must contain both labels 0 and 1.")
+
+    extractor = ScientificClaimExtractor()
+    predicted = []
+
+    print("\nAERF ENGINE - REAL MODEL PERFORMANCE REPORT")
+    print("=" * 65)
+
+    for sentence, expected in zip(sentences, actual):
+        prediction = int(bool(extractor.extract(sentence)))
+        predicted.append(prediction)
+
+        status = "CORRECT" if prediction == expected else "INCORRECT"
+        actual_name = "FINDING" if expected else "NOT_FINDING"
+        predicted_name = "FINDING" if prediction else "NOT_FINDING"
+
+        print(f"\n{status}")
+        print(f"Sentence  : {sentence}")
+        print(f"Actual    : {actual_name}")
+        print(f"Predicted : {predicted_name}")
+
+    accuracy = accuracy_score(actual, predicted)
+    precision = precision_score(actual, predicted, zero_division=0)
+    recall = recall_score(actual, predicted, zero_division=0)
+    f1 = f1_score(actual, predicted, zero_division=0)
+
+    # Rows: actual FINDING, actual NOT_FINDING.
+    # Columns: predicted FINDING, predicted NOT_FINDING.
+    matrix = confusion_matrix(actual, predicted, labels=[1, 0])
+    tp, fn = map(int, matrix[0])
+    fp, tn = map(int, matrix[1])
+
+    print("\n" + "=" * 65)
+    print(f"Total samples : {len(actual)}")
+    print(f"Correct       : {sum(a == p for a, p in zip(actual, predicted))}")
+    print(f"Incorrect     : {sum(a != p for a, p in zip(actual, predicted))}")
+    print(f"TP            : {tp}")
+    print(f"FP            : {fp}")
+    print(f"FN            : {fn}")
+    print(f"TN            : {tn}")
+    print("-" * 65)
+    print(f"Accuracy      : {accuracy:.2%}")
+    print(f"Precision     : {precision:.2%}")
+    print(f"Recall        : {recall:.2%}")
+    print(f"F1-score      : {f1:.2%}")
+
+    print("\nConfusion Matrix")
+    print("                         Predicted")
+    print("                    FINDING  NOT_FINDING")
+    print(f"Actual FINDING      {tp:7d}  {fn:11d}")
+    print(f"Actual NOT_FINDING  {fp:7d}  {tn:11d}")
+
+    print("\nClassification Report")
+    print(classification_report(
+        actual,
+        predicted,
+        labels=[1, 0],
+        target_names=["FINDING", "NOT_FINDING"],
+        zero_division=0,
+    ))
+
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+
+    report = {
+        "total_samples": len(actual),
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1,
+        "true_positive": tp,
+        "false_positive": fp,
+        "false_negative": fn,
+        "true_negative": tn,
+        "confusion_matrix": matrix.tolist(),
+        "note": "Results apply only to the labelled dataset used.",
+    }
+
+    (REPORT_DIR / "claim_extractor_metrics.json").write_text(
+        json.dumps(report, indent=2),
+        encoding="utf-8",
+    )
+
+    with (REPORT_DIR / "claim_extractor_predictions.csv").open(
+        "w", encoding="utf-8", newline=""
+    ) as file:
+        writer = csv.writer(file)
+        writer.writerow([
+            "sentence", "actual_label", "predicted_label", "correct"
+        ])
+        for sentence, a, p in zip(sentences, actual, predicted):
+            writer.writerow([sentence, a, p, a == p])
+
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        from sklearn.metrics import ConfusionMatrixDisplay
+
+        ConfusionMatrixDisplay(
+            confusion_matrix=matrix,
+            display_labels=["FINDING", "NOT_FINDING"],
+        ).plot(values_format="d")
+
+        plt.title("AERF Claim Extractor Confusion Matrix")
+        plt.tight_layout()
+        plt.savefig(
+            REPORT_DIR / "claim_extractor_confusion_matrix.png",
+            dpi=180,
+        )
+        plt.close()
+        print("\nConfusion matrix image saved.")
+    except ImportError:
+        print("\nMatplotlib not installed; image was not generated.")
+
+    print(f"\nReports saved to: {REPORT_DIR.resolve()}")
+
+
+if __name__ == "__main__":
+    main()

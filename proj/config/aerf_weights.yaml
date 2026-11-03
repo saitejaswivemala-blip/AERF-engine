@@ -1,0 +1,11 @@
+version: aerf-v1
+weights:
+  source: 0.10
+  methodology: 0.15
+  corroboration: 0.20
+  contradiction: 0.20
+  temporal: 0.10
+  semantic: 0.15
+  provenance: 0.10
+smoothing: 2.0
+temporal_decay_window_years: 10.0

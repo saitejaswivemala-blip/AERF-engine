@@ -1,0 +1,61 @@
+{
+  "_description": "Curated evaluation mapping for a diagnostic n=4 cross-document check of gt_01, gt_02, gt_03, gt_05. This file does NOT modify experiments/annotations/ground_truth_claim_pairs.json -- human_label and the original claim text are copied here read-only, for reference, so this file is self-contained and auditable without needing to cross-open the original. See experiments/reports/curated_mapping_rationale.md for the full rationale.",
+  "_status": "FILLED_IN",
+  "excluded_pairs": {
+    "gt_04": "Excluded per your read-only inspection: P5 has no extracted claim corresponding to this comparison.",
+    "gt_06": "Excluded for the same reason as gt_04 (shares the P5 side of the pair)."
+  },
+  "same_paper_diagnostics_only": {
+    "note": "gt_07 and gt_08 remain out of scope for this curated mapping. They stay handled exactly as before: resolvable-but-same-paper pairs, evaluated separately from cross-document metrics wherever they appear (see scripts/evaluate_real_results.py), because Phase3Pipeline.run()'s candidate generator explicitly skips same-paper pairs. This file does not process gt_07/gt_08 at all.",
+    "pair_ids": [
+      "gt_07",
+      "gt_08"
+    ]
+  },
+  "pairs": [
+    {
+      "pair_id": "gt_01",
+      "paper_a": "P1",
+      "paper_b": "P2",
+      "human_label": "supports",
+      "original_claim_a_text": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+      "original_claim_b_text": "After adjusting for cluster randomisation, vitamin D supplementation had no statistically significant effect on acute respiratory infection risk in the Blue Sky trial (odds ratio 0.58, 95% CI 0.26 to 1.29).",
+      "claim_a_id": 4,
+      "claim_b_id": 13,
+      "mapping_rationale": "User-supplied, verified against the real database: P1 claim_id=4, P2 claim_id=13. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_02",
+      "paper_a": "P1",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "original_claim_a_text": "Vitamin D supplementation for prevention of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+      "original_claim_b_text": "A population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause acute respiratory infection in UK adults (OR 1.09-1.26).",
+      "claim_a_id": 4,
+      "claim_b_id": 26,
+      "mapping_rationale": "User-supplied, verified against the real database: P1 claim_id=4, P3 claim_id=26. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_03",
+      "paper_a": "P2",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "original_claim_a_text": "After adjusting for cluster randomisation, vitamin D supplementation had no statistically significant effect on acute respiratory infection risk in the Blue Sky trial (odds ratio 0.58, 95% CI 0.26 to 1.29).",
+      "original_claim_b_text": "A population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause acute respiratory infection in UK adults (OR 1.09-1.26).",
+      "claim_a_id": 13,
+      "claim_b_id": 26,
+      "mapping_rationale": "User-supplied, verified against the real database: P2 claim_id=13, P3 claim_id=26. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    },
+    {
+      "pair_id": "gt_05",
+      "paper_a": "P4",
+      "paper_b": "P1",
+      "human_label": "neutral",
+      "original_claim_a_text": "In a meta-analysis of 18 RCTs, vitamin D supplements had a statistically significant beneficial effect in the TREATMENT of acute respiratory infections (RR 1.07, 95% CI 1.01 to 1.13).",
+      "original_claim_b_text": "Vitamin D supplementation for PREVENTION of acute respiratory infection showed no statistically significant overall effect (OR 0.94, 95% CI 0.88 to 1.00).",
+      "claim_a_id": 38,
+      "claim_b_id": 4,
+      "mapping_rationale": "User-supplied, verified against the real database: P4 claim_id=38, P1 claim_id=4. Provided directly by the user from their own inspection of experiments/runs/experiment.db (via scripts/inspect_claim_mapping.py / scripts/inspect_top_matches.py); the specific resolution method (exact/substring/token_overlap/manual) was not stated and is not assumed here."
+    }
+  ]
+}

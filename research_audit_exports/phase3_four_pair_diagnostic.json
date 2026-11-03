@@ -1,0 +1,155 @@
+{
+  "audit_metadata": {
+    "title": "Phase 3 Four-Pair Cross-Paper NLI Diagnostic Forensic Audit",
+    "timestamp": "2026-11-01T23:45:00Z",
+    "ground_truth_source_file": "proj/experiments/annotations/ground_truth_claim_pairs.json",
+    "curated_mapping_file": "proj/experiments/annotations/curated_mapping_gt01_gt02_gt03_gt05.json",
+    "evaluation_results_file": "proj/experiments/results/curated_comparison_real_models.json",
+    "evaluation_database": "proj/experiments/runs/experiment.db",
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "cosine_similarity_threshold": 0.55,
+    "entity_overlap_threshold": 0.15,
+    "nli_confidence_threshold": 0.6
+  },
+  "original_eight_pairs_status": [
+    {
+      "pair_id": "gt_01",
+      "paper_a": "P1",
+      "paper_b": "P2",
+      "human_label": "supports",
+      "status": "fully_mapped_and_evaluated"
+    },
+    {
+      "pair_id": "gt_02",
+      "paper_a": "P1",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "status": "fully_mapped_and_evaluated"
+    },
+    {
+      "pair_id": "gt_03",
+      "paper_a": "P2",
+      "paper_b": "P3",
+      "human_label": "supports",
+      "status": "fully_mapped_and_evaluated"
+    },
+    {
+      "pair_id": "gt_04",
+      "paper_a": "P1",
+      "paper_b": "P5",
+      "human_label": "neutral",
+      "status": "unresolved_missing_claim_in_db"
+    },
+    {
+      "pair_id": "gt_05",
+      "paper_a": "P4",
+      "paper_b": "P1",
+      "human_label": "neutral",
+      "status": "fully_mapped_and_evaluated"
+    },
+    {
+      "pair_id": "gt_06",
+      "paper_a": "P4",
+      "paper_b": "P5",
+      "human_label": "neutral",
+      "status": "unresolved_missing_claim_in_db"
+    },
+    {
+      "pair_id": "gt_07",
+      "paper_a": "P1",
+      "paper_b": "P1",
+      "human_label": "contradicts",
+      "status": "out_of_scope_same_paper"
+    },
+    {
+      "pair_id": "gt_08",
+      "paper_a": "P1",
+      "paper_b": "P1",
+      "human_label": "neutral",
+      "status": "out_of_scope_same_paper"
+    }
+  ],
+  "pairs": [
+    {
+      "pair_id": "gt_01",
+      "paper_a": "P1",
+      "paper_b": "P2",
+      "source_claim_id": 4,
+      "target_claim_id": 13,
+      "source_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+      "target_claim_text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+      "human_reference_label": "supports",
+      "cosine_similarity": 0.851235,
+      "entity_jaccard_overlap": 0.222222,
+      "cosine_candidate_gate_passed": true,
+      "entity_alignment_gate_passed": true,
+      "deberta_v3_predicted_nli_label": "neutral",
+      "nli_confidence_score": 0.986967,
+      "final_pipeline_relationship_label": "neutral",
+      "is_final_prediction_correct": false,
+      "similarity_only_baseline_prediction": "supports",
+      "similarity_only_baseline_correct": true
+    },
+    {
+      "pair_id": "gt_02",
+      "paper_a": "P1",
+      "paper_b": "P3",
+      "source_claim_id": 4,
+      "target_claim_id": 26,
+      "source_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+      "target_claim_text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+      "human_reference_label": "supports",
+      "cosine_similarity": 0.704122,
+      "entity_jaccard_overlap": 0.166667,
+      "cosine_candidate_gate_passed": true,
+      "entity_alignment_gate_passed": true,
+      "deberta_v3_predicted_nli_label": "neutral",
+      "nli_confidence_score": 0.983917,
+      "final_pipeline_relationship_label": "neutral",
+      "is_final_prediction_correct": false,
+      "similarity_only_baseline_prediction": "neutral",
+      "similarity_only_baseline_correct": false
+    },
+    {
+      "pair_id": "gt_03",
+      "paper_a": "P2",
+      "paper_b": "P3",
+      "source_claim_id": 13,
+      "target_claim_id": 26,
+      "source_claim_text": "In individual patient data analyses, there was also no statistically significant effect of vitamin D on the ARI risk or number of ARIs in any treatment group, or when pooled: odds ratio 0.58 (0.26-1.29), rate ratio 0.70 (0.44-1.12), respectively.",
+      "target_claim_text": "CONCLUSIONS: Among adults with a high baseline prevalence of sub-optimal vitamin D status, implementation of a population-level test-and-treat approach to vitamin D replacement did not reduce risk of all-cause ARI or COVID-19.",
+      "human_reference_label": "supports",
+      "cosine_similarity": 0.680537,
+      "entity_jaccard_overlap": 0.142857,
+      "cosine_candidate_gate_passed": true,
+      "entity_alignment_gate_passed": false,
+      "deberta_v3_predicted_nli_label": "neutral",
+      "nli_confidence_score": 0.986168,
+      "final_pipeline_relationship_label": "uncertain",
+      "is_final_prediction_correct": false,
+      "similarity_only_baseline_prediction": "neutral",
+      "similarity_only_baseline_correct": false
+    },
+    {
+      "pair_id": "gt_05",
+      "paper_a": "P4",
+      "paper_b": "P1",
+      "source_claim_id": 38,
+      "target_claim_id": 4,
+      "source_claim_text": "In the meta-analysis of all the trials, vitamin D supplements had a beneficial effect in the treatment of ARIs (relative risk (RR) = 1.07; 95% confidence interval (CI), 1.01-1.13; I2 = 66.9%).",
+      "target_claim_text": "For the primary comparison of any vitamin D vs. placebo, the intervention did not significantly affect overall ARI risk (OR 0.94, 95% CI 0.88 to 1.00, P=0.057; 40 studies; I2 26.4%).",
+      "human_reference_label": "neutral",
+      "cosine_similarity": 0.827267,
+      "entity_jaccard_overlap": 0.166667,
+      "cosine_candidate_gate_passed": true,
+      "entity_alignment_gate_passed": true,
+      "deberta_v3_predicted_nli_label": "contradiction",
+      "nli_confidence_score": 0.524964,
+      "final_pipeline_relationship_label": "uncertain",
+      "is_final_prediction_correct": false,
+      "similarity_only_baseline_prediction": "supports",
+      "similarity_only_baseline_correct": false
+    }
+  ]
+}

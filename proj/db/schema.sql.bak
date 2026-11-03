@@ -1,0 +1,147 @@
+-- AERF Engine — SQLite Schema
+-- Matches Section 5 of the approved design document.
+--
+-- PHASE 1 SCOPE: only `papers` and `chunks` are written to by Phase 1 code.
+-- All other tables are created now (schema stability across phases, per the
+-- approved architecture) but remain empty until their owning phase is built:
+--   entities, claims, claim_entities, relations        -> Phase 2
+--   claim_embeddings, claim_pairs, AERF, evidence graph, evolution/gaps -> Phase 3+
+-- Phase 3 extends these stable tables through Repository migrations.
+
+PRAGMA foreign_keys = ON;
+
+-- ============================================================
+-- PHASE 1 TABLES (implemented and populated now)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS papers (
+    paper_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    title                TEXT,
+    authors              TEXT,
+    publication_year     INTEGER,
+    venue                TEXT,
+    source_filename      TEXT NOT NULL UNIQUE,
+    source_path          TEXT NOT NULL,
+    page_count           INTEGER,
+    ingested_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS chunks (
+    chunk_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    paper_id             INTEGER NOT NULL REFERENCES papers(paper_id) ON DELETE CASCADE,
+    page_number          INTEGER NOT NULL,
+    char_start           INTEGER NOT NULL,
+    char_end             INTEGER NOT NULL,
+    text                 TEXT NOT NULL,
+    created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_chunks_paper_id ON chunks(paper_id);
+CREATE INDEX IF NOT EXISTS idx_chunks_page_number ON chunks(paper_id, page_number);
+
+-- ============================================================
+-- FUTURE-PHASE TABLES (schema only; not written to in Phase 1)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS entities (
+    entity_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    chunk_id             INTEGER NOT NULL REFERENCES chunks(chunk_id) ON DELETE CASCADE,
+    paper_id             INTEGER NOT NULL REFERENCES papers(paper_id) ON DELETE CASCADE,
+    text                 TEXT NOT NULL,
+    label                TEXT NOT NULL,
+    span_start           INTEGER NOT NULL,
+    span_end             INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS claims (
+    claim_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    paper_id             INTEGER NOT NULL REFERENCES papers(paper_id) ON DELETE CASCADE,
+    chunk_id             INTEGER NOT NULL REFERENCES chunks(chunk_id) ON DELETE CASCADE,
+    text                 TEXT NOT NULL,
+    span_start           INTEGER NOT NULL,
+    span_end             INTEGER NOT NULL,
+    extracted_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS claim_entities (
+    claim_id             INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    entity_id            INTEGER NOT NULL REFERENCES entities(entity_id) ON DELETE CASCADE,
+    PRIMARY KEY (claim_id, entity_id)
+);
+
+CREATE TABLE IF NOT EXISTS relations (
+    relation_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_id             INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    subject_entity_id    INTEGER NOT NULL REFERENCES entities(entity_id),
+    predicate            TEXT NOT NULL,
+    object_entity_id     INTEGER NOT NULL REFERENCES entities(entity_id)
+);
+
+CREATE TABLE IF NOT EXISTS claim_embeddings (
+    claim_id             INTEGER PRIMARY KEY REFERENCES claims(claim_id) ON DELETE CASCADE,
+    model_name           TEXT NOT NULL,
+    vector               BLOB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS claim_pairs (
+    pair_id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_a_id           INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    claim_b_id           INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    cosine_similarity    REAL,
+    nli_label            TEXT,
+    nli_confidence       REAL,
+    entity_overlap_score REAL,
+    validated_as         TEXT,
+    computed_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS aerf_scores (
+    score_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_id             INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    score                REAL NOT NULL,
+    factor_breakdown     TEXT NOT NULL,
+    weights_version      TEXT NOT NULL,
+    computed_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_current           BOOLEAN DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS aerf_score_history (
+    history_id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_id             INTEGER NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    old_score            REAL,
+    new_score            REAL,
+    triggered_by_paper_id  INTEGER REFERENCES papers(paper_id),
+    triggered_by_claim_id  INTEGER REFERENCES claims(claim_id),
+    factor_deltas         TEXT,
+    reason                TEXT,
+    changed_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS evidence_graph_edges (
+    edge_id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_node_type       TEXT NOT NULL,
+    source_node_id         INTEGER NOT NULL,
+    target_node_type       TEXT NOT NULL,
+    target_node_id         INTEGER NOT NULL,
+    edge_type              TEXT NOT NULL,
+    weight                 REAL
+);
+
+CREATE TABLE IF NOT EXISTS knowledge_evolution_snapshots (
+    snapshot_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    topic_key               TEXT NOT NULL,
+    as_of_year               INTEGER NOT NULL,
+    dominant_claim_id        INTEGER REFERENCES claims(claim_id),
+    dominant_aerf_score      REAL,
+    supporting_claim_count   INTEGER,
+    contradicting_claim_count INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS research_gaps (
+    gap_id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    topic_key                TEXT NOT NULL,
+    gap_type                  TEXT NOT NULL,
+    description                TEXT,
+    related_claim_ids          TEXT,
+    detected_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

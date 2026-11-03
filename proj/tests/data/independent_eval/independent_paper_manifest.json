@@ -1,0 +1,201 @@
+{
+  "manifest_name": "AERF Engine Independent Evaluation Paper Manifest",
+  "status": "PENDING_UNSEEN_DATA_COLLECTION",
+  "created_at": "2026-10-21T15:45:00+05:30",
+  "version": "1.0.0",
+  "collection_guidelines": "docs/INDEPENDENT_EVALUATION_PROTOCOL.md",
+  "annotation_guidelines": "docs/CLAIM_ANNOTATION_GUIDELINES.md",
+  "strict_exclusion_list": [
+    {
+      "paper_id": "Vaswani2017",
+      "doi": "arXiv:1706.03762",
+      "title": "Attention Is All You Need",
+      "reason": "Direct rule-tuning leakage in nlp/claim_extractor.py and test fixtures"
+    },
+    {
+      "paper_id": "Devlin2018",
+      "doi": "arXiv:1810.04805",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers",
+      "reason": "Direct domain overlap with rule-targeted NLP benchmark terminology"
+    },
+    {
+      "paper_id": "Martineau2017",
+      "doi": "10.1136/bmj.i6583",
+      "title": "Vitamin D supplementation to prevent acute respiratory infections: systematic review",
+      "reason": "Senior authorship overlap with P1/P3 and foundational baseline of P1/P2"
+    },
+    {
+      "paper_id": "Jolliffe2024",
+      "doi": "10.1101/2024.09.18.24313866",
+      "title": "Vitamin D supplementation to prevent acute respiratory infections (P1)",
+      "reason": "Core project experiment manifest paper and Phase 2 mapping source"
+    },
+    {
+      "paper_id": "Bolland2022",
+      "doi": "10.1101/2022.02.03.22270409",
+      "title": "Vitamin D and acute respiratory infection: secondary analysis (P2)",
+      "reason": "Core project experiment manifest paper and Phase 2 mapping source"
+    },
+    {
+      "paper_id": "Jolliffe2022_CORONAVIT",
+      "doi": "10.1101/2022.03.22.22271707",
+      "title": "Vitamin D Supplements for Prevention of COVID-19 (P3)",
+      "reason": "Core project experiment manifest paper and Phase 2 mapping source"
+    },
+    {
+      "paper_id": "Zhang2022",
+      "doi": "PMCID:PMC8955452",
+      "title": "Efficacy of Vitamin D Supplements in Treatment of ARI (P4)",
+      "reason": "Core project experiment manifest paper and Phase 2 mapping source"
+    }
+  ],
+  "target_disciplines": [
+    "Materials Science & Metallurgy",
+    "Astrophysics & Planetary Science",
+    "Plant Biology & Agronomy",
+    "Environmental Chemistry & Oceanography",
+    "Renewable Energy & Battery Systems",
+    "Structural Geology & Geophysics"
+  ],
+  "required_paper_fields": [
+    "paper_id",
+    "title",
+    "authors",
+    "publication_year",
+    "venue_or_journal",
+    "doi_or_url",
+    "scientific_discipline",
+    "pdf_sha256",
+    "split_assignment",
+    "source_verification_status",
+    "development_history_check"
+  ],
+  "registered_independent_papers": [
+    {
+      "paper_id": "INDEP_01_MATSCI",
+      "title": "Effect of severe plastic deformation realized by rotary swaging on the mechanical properties and corrosion resistance of near-alpha-titanium alloy Ti-2.5Al-2.6Zr",
+      "authors": "V.N. Chuvil'deev, V.I. Kopylov, A.V. Nokhrin, et al.",
+      "publication_year": 2024,
+      "venue_or_journal": "arXiv:cond-mat.mtrl-sci",
+      "doi_or_url": "arXiv:2401.17672",
+      "scientific_discipline": "Materials Science & Metallurgy",
+      "pdf_filename": "INDEP_01_MATSCI.pdf",
+      "pdf_sha256": "bd22c00c63ca7bb1f2c4f0886663c2a5c0752fa7041394902761cd48e2e62f47",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_02_ASTRO",
+      "title": "Muted Features in the JWST NIRISS Transmission Spectrum of Hot-Neptune LTT 9779 b",
+      "authors": "Michael Radica, David Lafreniere, et al.",
+      "publication_year": 2024,
+      "venue_or_journal": "arXiv:astro-ph.EP",
+      "doi_or_url": "arXiv:2401.15548",
+      "scientific_discipline": "Astrophysics & Planetary Science",
+      "pdf_filename": "INDEP_02_ASTRO.pdf",
+      "pdf_sha256": "749df59038e0035036c1437624a03d563c71e986dc57e747052dcf7a0e5486f8",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_03_ENERGY",
+      "title": "Enhancement of Li and Na Storage in Janus HfSSe Monolayers by Co-Induced Electron-Deficient Chalcogen Sites: A First-Principles Study",
+      "authors": "Md. Muktadir Hasan, Md. Mafizul Islam, Ahmed Zubair",
+      "publication_year": 2026,
+      "venue_or_journal": "arXiv:physics.app-ph",
+      "doi_or_url": "arXiv:2610.28152",
+      "scientific_discipline": "Renewable Energy & Battery Systems",
+      "pdf_filename": "INDEP_03_ENERGY.pdf",
+      "pdf_sha256": "ec7c9054bc842584b8e61ecbf220dae7fe36e196017e18888fea5fd42303f4a6",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_04_GEOL",
+      "title": "HypoNet Nankai PS: rapid hypocenter determination for the Nankai Trough using physics-informed neural networks with three-dimensional P- and S-wave velocity models",
+      "authors": "Ryoichiro Agata, Ayako Nakanishi, Dan Bassett, et al.",
+      "publication_year": 2026,
+      "venue_or_journal": "arXiv:physics.geo-ph",
+      "doi_or_url": "arXiv:2610.27561",
+      "scientific_discipline": "Structural Geology & Seismology",
+      "pdf_filename": "INDEP_04_GEOL.pdf",
+      "pdf_sha256": "41705438b1f70f1503c71c57455ad174c9aadddcc51ac18939c22d0087f24530",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_05_CLIM",
+      "title": "Disentangling forced and internal components in observed climate evolution using spatiotemporal deep learning",
+      "authors": "Parvathi Kooloth, Wenyu Zhou, L. Ruby Leung, et al.",
+      "publication_year": 2026,
+      "venue_or_journal": "arXiv:physics.ao-ph",
+      "doi_or_url": "arXiv:2610.28219",
+      "scientific_discipline": "Atmospheric Physics & Climatology",
+      "pdf_filename": "INDEP_05_CLIM.pdf",
+      "pdf_sha256": "e1c62e6640a16d3a23241be5e63c81ce5cf3c1749cf5a258a158353bfa2fa052",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_06_ECOL",
+      "title": "The resource cost of cooperative invasion",
+      "authors": "Abhishek Chowdhury",
+      "publication_year": 2026,
+      "venue_or_journal": "arXiv:q-bio.PE",
+      "doi_or_url": "arXiv:2610.26235",
+      "scientific_discipline": "Ecology & Marine Biodiversity",
+      "pdf_filename": "INDEP_06_ECOL.pdf",
+      "pdf_sha256": "38de50e5f68480cbb8a7668dae23aeb4e0b90d022db233d9998774716cd99d4e",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_07_QUANTUM",
+      "title": "Tuning between collective dynamics and scrambling through initial-state symmetry alignment in long-range spin models",
+      "authors": "Sridevi Kuriyattil, Johannes Kombe, Andrew J. Daley, et al.",
+      "publication_year": 2026,
+      "venue_or_journal": "arXiv:quant-ph",
+      "doi_or_url": "arXiv:2610.28462",
+      "scientific_discipline": "Quantum Optics & Condensed Matter",
+      "pdf_filename": "INDEP_07_QUANTUM.pdf",
+      "pdf_sha256": "5974f1b1700802319e852abf940481b8c6976a0b9d87f5f6969c32ee07546e78",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_08_PLANTBIO",
+      "title": "The Mathematics of Chlorophyll Photoexcitation",
+      "authors": "Archit Chaturvedi",
+      "publication_year": 2024,
+      "venue_or_journal": "arXiv:q-bio.BM",
+      "doi_or_url": "arXiv:2405.06644",
+      "scientific_discipline": "Plant Biology & Photosynthesis",
+      "pdf_filename": "INDEP_08_PLANTBIO.pdf",
+      "pdf_sha256": "8a4217a86606a88eea767478043e588624d866961f5d61fce69f06b92090bafc",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    },
+    {
+      "paper_id": "INDEP_09_ENVGEO",
+      "title": "Groundwater dynamics beneath a marine ice sheet",
+      "authors": "Gabriel J. Cairns, Graham P. Benham, Ian J. Hewitt",
+      "publication_year": 2024,
+      "venue_or_journal": "arXiv:physics.geo-ph",
+      "doi_or_url": "arXiv:2409.11848",
+      "scientific_discipline": "Environmental Geochemistry & Hydrology",
+      "pdf_filename": "INDEP_09_ENVGEO.pdf",
+      "pdf_sha256": "ba5ea793d909485599dd7dda717f12cdf5b37cd50ff6a2b8683d02edcecc2bbd",
+      "split_assignment": "INDEPENDENT_TEST",
+      "source_verification_status": "VERIFIED_OPEN_ACCESS_PDF",
+      "development_history_check": "VERIFIED_UNSEEN_IN_AERF"
+    }
+  ]
+}

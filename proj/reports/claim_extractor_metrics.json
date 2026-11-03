@@ -1,0 +1,371 @@
+{
+  "total_samples": 80,
+  "accuracy": 0.875,
+  "accuracy_95ci": [
+    0.785,
+    0.9307
+  ],
+  "precision": 0.7727272727272727,
+  "precision_95ci": [
+    0.6301,
+    0.8716
+  ],
+  "recall": 1.0,
+  "recall_95ci": [
+    0.8985,
+    1.0
+  ],
+  "f1_score": 0.8717948717948718,
+  "true_positive": 34,
+  "false_positive": 10,
+  "false_negative": 0,
+  "true_negative": 36,
+  "confusion_matrix": [
+    [
+      34,
+      0
+    ],
+    [
+      10,
+      36
+    ]
+  ],
+  "macro_avg": {
+    "precision": 0.8863636363636364,
+    "recall": 0.8913043478260869,
+    "f1_score": 0.8749218261413383
+  },
+  "weighted_avg": {
+    "precision": 0.903409090909091,
+    "recall": 0.875,
+    "f1_score": 0.8753908692933084
+  },
+  "class_breakdown": {
+    "FINDING (1)": {
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "f1_score": 0.8717948717948718,
+      "support": 34
+    },
+    "NOT_FINDING (0)": {
+      "precision": 1.0,
+      "recall": 0.782608695652174,
+      "f1_score": 0.8780487804878049,
+      "support": 46
+    }
+  },
+  "dataset_path": "C:\\Users\\tejas\\Downloads\\AERF-engine-FIXED\\proj\\tests\\data\\claim_extractor_eval.csv",
+  "dataset_type": "real_paper",
+  "dataset_source": "Genuine research papers in repository: Vaswani et al. (2017) [arXiv:1706.03762v7], Devlin et al. (2018) [arXiv:1810.04805v2], Martineau et al. (2017) [BMJ 2017;356:i6583], Bolland et al. (2022) [medRxiv 10.1101/2022.02.03.22270409], Jolliffe et al. (2024) [medRxiv 10.1101/2024.09.18.24313866], Jolliffe et al. (2022) CORONAVIT [medRxiv 10.1101/2022.03.22.22271707], Zhang et al. (2022) [PMCID: PMC8955452]",
+  "per_category_metrics": {
+    "finding": {
+      "total": 11,
+      "correct": 11,
+      "actual_claims": 11,
+      "predicted_claims": 11,
+      "true_positive": 11,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 0,
+      "accuracy": 1.0
+    },
+    "statistical_result": {
+      "total": 12,
+      "correct": 12,
+      "actual_claims": 12,
+      "predicted_claims": 12,
+      "true_positive": 12,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 0,
+      "accuracy": 1.0
+    },
+    "background": {
+      "total": 11,
+      "correct": 8,
+      "actual_claims": 0,
+      "predicted_claims": 3,
+      "true_positive": 0,
+      "false_positive": 3,
+      "false_negative": 0,
+      "true_negative": 8,
+      "accuracy": 0.7272727272727273
+    },
+    "methodology": {
+      "total": 12,
+      "correct": 8,
+      "actual_claims": 0,
+      "predicted_claims": 4,
+      "true_positive": 0,
+      "false_positive": 4,
+      "false_negative": 0,
+      "true_negative": 8,
+      "accuracy": 0.6666666666666666
+    },
+    "dataset_description": {
+      "total": 9,
+      "correct": 7,
+      "actual_claims": 0,
+      "predicted_claims": 2,
+      "true_positive": 0,
+      "false_positive": 2,
+      "false_negative": 0,
+      "true_negative": 7,
+      "accuracy": 0.7777777777777778
+    },
+    "limitation": {
+      "total": 5,
+      "correct": 5,
+      "actual_claims": 0,
+      "predicted_claims": 0,
+      "true_positive": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 5,
+      "accuracy": 1.0
+    },
+    "ambiguous": {
+      "total": 8,
+      "correct": 7,
+      "actual_claims": 3,
+      "predicted_claims": 4,
+      "true_positive": 3,
+      "false_positive": 1,
+      "false_negative": 0,
+      "true_negative": 4,
+      "accuracy": 0.875
+    },
+    "hypothesis": {
+      "total": 4,
+      "correct": 4,
+      "actual_claims": 0,
+      "predicted_claims": 0,
+      "true_positive": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 4,
+      "accuracy": 1.0
+    },
+    "negative_finding": {
+      "total": 8,
+      "correct": 8,
+      "actual_claims": 8,
+      "predicted_claims": 8,
+      "true_positive": 8,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 0,
+      "accuracy": 1.0
+    }
+  },
+  "per_paper_metrics": {
+    "Vaswani et al. (2017)": {
+      "total": 16,
+      "correct": 14,
+      "actual_claims": 6,
+      "predicted_claims": 8,
+      "true_positive": 6,
+      "false_positive": 2,
+      "false_negative": 0,
+      "true_negative": 8,
+      "accuracy": 0.875
+    },
+    "Devlin et al. (2018)": {
+      "total": 13,
+      "correct": 13,
+      "actual_claims": 4,
+      "predicted_claims": 4,
+      "true_positive": 4,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 9,
+      "accuracy": 1.0
+    },
+    "Martineau et al. (2017)": {
+      "total": 14,
+      "correct": 12,
+      "actual_claims": 7,
+      "predicted_claims": 9,
+      "true_positive": 7,
+      "false_positive": 2,
+      "false_negative": 0,
+      "true_negative": 5,
+      "accuracy": 0.8571428571428571
+    },
+    "Bolland et al. (2022)": {
+      "total": 12,
+      "correct": 10,
+      "actual_claims": 6,
+      "predicted_claims": 8,
+      "true_positive": 6,
+      "false_positive": 2,
+      "false_negative": 0,
+      "true_negative": 4,
+      "accuracy": 0.8333333333333334
+    },
+    "Jolliffe et al. (2024)": {
+      "total": 13,
+      "correct": 12,
+      "actual_claims": 6,
+      "predicted_claims": 7,
+      "true_positive": 6,
+      "false_positive": 1,
+      "false_negative": 0,
+      "true_negative": 6,
+      "accuracy": 0.9230769230769231
+    },
+    "Jolliffe et al. (2022) CORONAVIT": {
+      "total": 8,
+      "correct": 7,
+      "actual_claims": 4,
+      "predicted_claims": 5,
+      "true_positive": 4,
+      "false_positive": 1,
+      "false_negative": 0,
+      "true_negative": 3,
+      "accuracy": 0.875
+    },
+    "Zhang et al. (2022)": {
+      "total": 4,
+      "correct": 2,
+      "actual_claims": 1,
+      "predicted_claims": 3,
+      "true_positive": 1,
+      "false_positive": 2,
+      "false_negative": 0,
+      "true_negative": 1,
+      "accuracy": 0.5
+    }
+  },
+  "baseline_comparisons": {
+    "majority_class_baseline": {
+      "description": "Always predicts the majority class (label 0 / Non-Claim). Zero-intelligence baseline.",
+      "metrics": {
+        "total_samples": 80,
+        "accuracy": 0.575,
+        "accuracy_95ci": [
+          0.4657,
+          0.6774
+        ],
+        "precision": 0.0,
+        "precision_95ci": [
+          0.0,
+          0.0
+        ],
+        "recall": 0.0,
+        "recall_95ci": [
+          0.0,
+          0.1015
+        ],
+        "f1_score": 0.0,
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 34,
+        "true_negative": 46,
+        "confusion_matrix": [
+          [
+            0,
+            34
+          ],
+          [
+            0,
+            46
+          ]
+        ],
+        "macro_avg": {
+          "precision": 0.2875,
+          "recall": 0.5,
+          "f1_score": 0.36507936507936506
+        },
+        "weighted_avg": {
+          "precision": 0.330625,
+          "recall": 0.575,
+          "f1_score": 0.41984126984126985
+        },
+        "class_breakdown": {
+          "FINDING (1)": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 34
+          },
+          "NOT_FINDING (0)": {
+            "precision": 0.575,
+            "recall": 1.0,
+            "f1_score": 0.7301587301587301,
+            "support": 46
+          }
+        }
+      }
+    },
+    "rule_based_keyword_baseline": {
+      "description": "Regex matching empirical outcome keywords (outperform, significant, ratio, p-value) with method lead suppression.",
+      "metrics": {
+        "total_samples": 80,
+        "accuracy": 0.7875,
+        "accuracy_95ci": [
+          0.6858,
+          0.8629
+        ],
+        "precision": 0.7931034482758621,
+        "precision_95ci": [
+          0.6161,
+          0.9015
+        ],
+        "recall": 0.6764705882352942,
+        "recall_95ci": [
+          0.5084,
+          0.8087
+        ],
+        "f1_score": 0.7301587301587301,
+        "true_positive": 23,
+        "false_positive": 6,
+        "false_negative": 11,
+        "true_negative": 40,
+        "confusion_matrix": [
+          [
+            23,
+            11
+          ],
+          [
+            6,
+            40
+          ]
+        ],
+        "macro_avg": {
+          "precision": 0.788708586883029,
+          "recall": 0.7730179028132993,
+          "f1_score": 0.7774504990999835
+        },
+        "weighted_avg": {
+          "precision": 0.7880493576741041,
+          "recall": 0.7875,
+          "f1_score": 0.7845442644411716
+        },
+        "class_breakdown": {
+          "FINDING (1)": {
+            "precision": 0.7931034482758621,
+            "recall": 0.6764705882352942,
+            "f1_score": 0.7301587301587301,
+            "support": 34
+          },
+          "NOT_FINDING (0)": {
+            "precision": 0.7843137254901961,
+            "recall": 0.8695652173913043,
+            "f1_score": 0.8247422680412371,
+            "support": 46
+          }
+        }
+      }
+    }
+  },
+  "evaluation_limitations": [
+    "Sentence-level evaluation excludes cross-sentence discourse context (e.g., transitional phrases or multi-sentence paragraphs).",
+    "Domain representation: Current benchmark covers NLP/Machine Learning and Epidemiology/Clinical Trials, but does not yet cover physical or chemical sciences.",
+    "Zero-shot DistilBART exhibits a recall bias, occasionally accepting hypothesis formulations or literature review summaries as findings.",
+    "Single-annotator expert review: Annotation followed strict documented guidelines, but multi-annotator inter-rater reliability (Cohen's kappa) is an opportunity for future expansion.",
+    "Paper clustering: Sentences sampled from the same paper share stylistic, vocabulary, and subject-matter characteristics; confidence intervals must account for clustering.",
+    "Corpus overlap: Several development papers were referenced during heuristic cue formulation; true independent testing requires collection of entirely unseen scientific papers."
+  ],
+  "note": "Evaluation evaluated against genuine sentences extracted from published papers. Ground-truth annotations follow documented scientific-finding classification guidelines."
+}

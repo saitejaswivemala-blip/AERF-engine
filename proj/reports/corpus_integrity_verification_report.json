@@ -1,0 +1,443 @@
+{
+  "timestamp": "2026-10-21T11:25:42Z",
+  "all_passed": true,
+  "total_papers": 9,
+  "total_sentences": 143,
+  "cross_paper_duplicates": 0,
+  "papers": {
+    "INDEP_01_MATSCI": {
+      "title": "Effect of severe plastic deformation realized by rotary swaging on the mechanical properties and corrosion resistance of near-alpha-titanium alloy Ti-2.5Al-2.6Zr",
+      "doi_or_url": "arXiv:2401.17672",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Effect of severe plastic deformation realized by rotary swaging on the mechanical properties and corrosion resistance of near-a-titanium alloy Ti-2.5Al-2.6Zr",
+          "api_authors": [
+            "V. N. Chuvil'deev",
+            "V. I. Kopylov",
+            "A. V. Nokhrin",
+            "P. V. Tryaev",
+            "N. Yu. Tabachkova",
+            "M. K. Chegurov",
+            "N. A. Kozlova",
+            "A. S. Mikhaylov",
+            "A. V. Ershova",
+            "M. Yu. Grayznov",
+            "I. S. Shadrina",
+            "C. V. Likhnitskii"
+          ],
+          "published": "2024-01-31T08:50:59Z",
+          "primary_category": "cond-mat.mtrl-sci",
+          "title_match": true
+        },
+        "pdf_pages": 37,
+        "pdf_total_chars": 40804,
+        "metadata_match": {
+          "title_word_overlap": 0.9285714285714286,
+          "matched_authors": [
+            "V.N. Chuvil'deev",
+            "V.I. Kopylov",
+            "A.V. Nokhrin"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "bd22c00c63ca7bb1f2c4f0886663c2a5c0752fa7041394902761cd48e2e62f47",
+        "expected_sha256": "bd22c00c63ca7bb1f2c4f0886663c2a5c0752fa7041394902761cd48e2e62f47",
+        "sample_sentence_count": 15,
+        "missing_sentences": [],
+        "sentence_page_hits": 15,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_02_ASTRO": {
+      "title": "Muted Features in the JWST NIRISS Transmission Spectrum of Hot-Neptune LTT 9779 b",
+      "doi_or_url": "arXiv:2401.15548",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Muted Features in the JWST NIRISS Transmission Spectrum of Hot-Neptune LTT 9779 b",
+          "api_authors": [
+            "Michael Radica",
+            "Louis-Philippe Coulombe",
+            "Jake Taylor",
+            "Lo\u00efc Albert",
+            "Romain Allart",
+            "Bj\u00f6rn Benneke",
+            "Nicolas B. Cowan",
+            "Lisa Dang",
+            "David Lafreni\u00e8re",
+            "Daniel Thorngren",
+            "\u00c9tienne Artigau",
+            "Ren\u00e9 Doyon",
+            "Laura Flagg",
+            "Doug Johnstone",
+            "Stefan Pelletier",
+            "Pierre-Alexis Roy"
+          ],
+          "published": "2024-01-28T02:58:12Z",
+          "primary_category": "astro-ph.EP",
+          "title_match": true
+        },
+        "pdf_pages": 14,
+        "pdf_total_chars": 55275,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Michael Radica",
+            "David Lafreniere"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "749df59038e0035036c1437624a03d563c71e986dc57e747052dcf7a0e5486f8",
+        "expected_sha256": "749df59038e0035036c1437624a03d563c71e986dc57e747052dcf7a0e5486f8",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_03_ENERGY": {
+      "title": "Enhancement of Li and Na Storage in Janus HfSSe Monolayers by Co-Induced Electron-Deficient Chalcogen Sites: A First-Principles Study",
+      "doi_or_url": "arXiv:2610.28152",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Enhancement of Li and Na Storage in Janus HfSSe Monolayers by Co-Induced Electron-Deficient Chalcogen Sites: A First-Principles Study",
+          "api_authors": [
+            "Md. Muktadir Hasan",
+            "Md. Mafizul Islam",
+            "Ahmed Zubair"
+          ],
+          "published": "2026-10-20T12:57:20Z",
+          "primary_category": "cond-mat.mtrl-sci",
+          "title_match": true
+        },
+        "pdf_pages": 17,
+        "pdf_total_chars": 70339,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Md. Muktadir Hasan",
+            "Md. Mafizul Islam",
+            "Ahmed Zubair"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "ec7c9054bc842584b8e61ecbf220dae7fe36e196017e18888fea5fd42303f4a6",
+        "expected_sha256": "ec7c9054bc842584b8e61ecbf220dae7fe36e196017e18888fea5fd42303f4a6",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_04_GEOL": {
+      "title": "HypoNet Nankai PS: rapid hypocenter determination for the Nankai Trough using physics-informed neural networks with three-dimensional P- and S-wave velocity models",
+      "doi_or_url": "arXiv:2610.27561",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "HypoNet Nankai PS: rapid hypocenter determination for the Nankai Trough using physics-informed neural networks with three-dimensional P- and S-wave velocity models",
+          "api_authors": [
+            "Ryoichiro Agata",
+            "Ayako Nakanishi",
+            "Dan Bassett",
+            "Satoru Baba",
+            "Yasuyuki Nakamura",
+            "Gou Fujie"
+          ],
+          "published": "2026-10-20T03:22:04Z",
+          "primary_category": "physics.geo-ph",
+          "title_match": true
+        },
+        "pdf_pages": 34,
+        "pdf_total_chars": 69471,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Ryoichiro Agata",
+            "Ayako Nakanishi",
+            "Dan Bassett"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "41705438b1f70f1503c71c57455ad174c9aadddcc51ac18939c22d0087f24530",
+        "expected_sha256": "41705438b1f70f1503c71c57455ad174c9aadddcc51ac18939c22d0087f24530",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_05_CLIM": {
+      "title": "Disentangling forced and internal components in observed climate evolution using spatiotemporal deep learning",
+      "doi_or_url": "arXiv:2610.28219",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Disentangling forced and internal components in observed climate evolution using spatiotemporal deep learning",
+          "api_authors": [
+            "Parvathi Kooloth",
+            "Wenyu Zhou",
+            "L. Ruby Leung",
+            "Shang-Ping Xie",
+            "Hailong Wang",
+            "Qiang Fu"
+          ],
+          "published": "2026-10-20T13:54:47Z",
+          "primary_category": "physics.ao-ph",
+          "title_match": true
+        },
+        "pdf_pages": 45,
+        "pdf_total_chars": 71852,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Parvathi Kooloth",
+            "Wenyu Zhou",
+            "L. Ruby Leung"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "e1c62e6640a16d3a23241be5e63c81ce5cf3c1749cf5a258a158353bfa2fa052",
+        "expected_sha256": "e1c62e6640a16d3a23241be5e63c81ce5cf3c1749cf5a258a158353bfa2fa052",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_06_ECOL": {
+      "title": "The resource cost of cooperative invasion",
+      "doi_or_url": "arXiv:2610.26235",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "The resource cost of cooperative invasion",
+          "api_authors": [
+            "Abhishek Chowdhury"
+          ],
+          "published": "2026-10-19T12:00:54Z",
+          "primary_category": "q-bio.PE",
+          "title_match": true
+        },
+        "pdf_pages": 82,
+        "pdf_total_chars": 395859,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Abhishek Chowdhury"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "38de50e5f68480cbb8a7668dae23aeb4e0b90d022db233d9998774716cd99d4e",
+        "expected_sha256": "38de50e5f68480cbb8a7668dae23aeb4e0b90d022db233d9998774716cd99d4e",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_07_QUANTUM": {
+      "title": "Tuning between collective dynamics and scrambling through initial-state symmetry alignment in long-range spin models",
+      "doi_or_url": "arXiv:2610.28462",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Tuning between collective dynamics and scrambling through initial-state symmetry alignment in long-range spin models",
+          "api_authors": [
+            "Sridevi Kuriyattil",
+            "Johannes Kombe",
+            "Andrew J. Daley",
+            "Pablo M. Poggi"
+          ],
+          "published": "2026-10-20T16:15:56Z",
+          "primary_category": "quant-ph",
+          "title_match": true
+        },
+        "pdf_pages": 20,
+        "pdf_total_chars": 73748,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Sridevi Kuriyattil",
+            "Johannes Kombe",
+            "Andrew J. Daley"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "5974f1b1700802319e852abf940481b8c6976a0b9d87f5f6969c32ee07546e78",
+        "expected_sha256": "5974f1b1700802319e852abf940481b8c6976a0b9d87f5f6969c32ee07546e78",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_08_PLANTBIO": {
+      "title": "The Mathematics of Chlorophyll Photoexcitation",
+      "doi_or_url": "arXiv:2405.06644",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "The Mathematics of Chlorophyll Photoexcitation",
+          "api_authors": [
+            "Archit Chaturvedi"
+          ],
+          "published": "2024-03-07T21:53:59Z",
+          "primary_category": "q-bio.BM",
+          "title_match": true
+        },
+        "pdf_pages": 6,
+        "pdf_total_chars": 11301,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Archit Chaturvedi"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "8a4217a86606a88eea767478043e588624d866961f5d61fce69f06b92090bafc",
+        "expected_sha256": "8a4217a86606a88eea767478043e588624d866961f5d61fce69f06b92090bafc",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    },
+    "INDEP_09_ENVGEO": {
+      "title": "Groundwater dynamics beneath a marine ice sheet",
+      "doi_or_url": "arXiv:2409.11848",
+      "status": "PASS",
+      "checks": {
+        "arxiv_api_resolution": true,
+        "pdf_file_exists": true,
+        "pdf_readable": true,
+        "pdf_matches_metadata": true,
+        "sha256_checksum_match": true,
+        "sentences_present_in_pdf": true,
+        "no_duplicate_sentences": true,
+        "no_dev_corpus_overlap": true
+      },
+      "evidence": {
+        "arxiv_api": {
+          "api_title": "Groundwater dynamics beneath a marine ice sheet",
+          "api_authors": [
+            "Gabriel Cairns",
+            "Graham Benham",
+            "Ian Hewitt"
+          ],
+          "published": "2024-09-18T10:02:18Z",
+          "primary_category": "physics.geo-ph",
+          "title_match": true
+        },
+        "pdf_pages": 33,
+        "pdf_total_chars": 76555,
+        "metadata_match": {
+          "title_word_overlap": 1.0,
+          "matched_authors": [
+            "Gabriel J. Cairns",
+            "Graham P. Benham",
+            "Ian J. Hewitt"
+          ],
+          "author_found": true
+        },
+        "computed_sha256": "ba5ea793d909485599dd7dda717f12cdf5b37cd50ff6a2b8683d02edcecc2bbd",
+        "expected_sha256": "ba5ea793d909485599dd7dda717f12cdf5b37cd50ff6a2b8683d02edcecc2bbd",
+        "sample_sentence_count": 16,
+        "missing_sentences": [],
+        "sentence_page_hits": 16,
+        "internal_duplicates": 0,
+        "dev_overlap": false
+      }
+    }
+  }
+}
